@@ -1,0 +1,66 @@
+version: "3.8"
+
+services:
+  wsgi:
+    build:
+      context: ./src
+      dockerfile: Dockerfile
+    container_name: wsgi
+    command: gunicorn --reload config.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/media
+    env_file:
+      - ./.env.docker
+    networks:
+      - web
+    depends_on:
+      - db
+      - redis
+    expose:
+      - 8000
+
+  db:
+    image: postgres
+    container_name: db
+    env_file:
+      - ./.env.docker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - web
+
+  redis:
+    image: redis
+    container_name: redis
+    env_file:
+      - ./.env.docker
+    restart: always
+    networks:
+      - web
+    expose:
+      - 6379
+
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - wsgi
+    restart: always
+    volumes:
+      - static_volume:/usr/src/app/staticfiles
+      - media_volume:/usr/src/app/media
+    networks:
+      - web
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:
+
+networks:
+  web:
+    driver: bridge
