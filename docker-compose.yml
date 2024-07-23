@@ -16,6 +16,7 @@ services:
       - web
     depends_on:
       - db
+      - rabbitmq
       - redis
     expose:
       - 8000
@@ -43,8 +44,8 @@ services:
 
   nginx:
     build:
-      context: ./nginx
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./nginx/Dockerfile
     ports:
       - 80:80
     depends_on:
@@ -53,6 +54,15 @@ services:
     volumes:
       - static_volume:/usr/src/app/staticfiles
       - media_volume:/usr/src/app/media
+    networks:
+      - web
+
+  rabbimq:
+    image: rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    restart: always
     networks:
       - web
 

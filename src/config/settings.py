@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_extensions'
+    'django_extensions',
+    "rest_framework",
+    "users.apps.UsersConfig",
 ]
 
 MIDDLEWARE = [
@@ -172,3 +174,7 @@ LOGIN_REDIRECT_URL = 'home'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = []
+
+REST_FRAMEWORK = {
+
+}
