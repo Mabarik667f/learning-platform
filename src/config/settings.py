@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 import os.path
 from pathlib import Path
+from django.conf.global_settings import AUTH_USER_MODEL
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,7 +25,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('SECRET_KEY')
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.getenv('DEBUG', default=0))
 
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django_extensions',
     "rest_framework",
     "users.apps.UsersConfig",
+    "courses.apps.CoursesConfig"
 ]
 
 MIDDLEWARE = [
@@ -82,7 +83,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('SQL_ENGINE'),
-        'NAME': os.getenv('SQL_DB'),
+        'NAME': 'lea_platform',
         'USER': os.getenv('SQL_USER'),
         'PASSWORD': os.getenv('SQL_PASSWORD'),
         'HOST': os.getenv('SQL_HOST'),
@@ -93,7 +94,7 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
-
+AUTH_USER_MODEL = 'users.User'
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
