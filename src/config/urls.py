@@ -23,6 +23,8 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls')),
+    path('v1/users/', include('users.urls')),
+    path('v1/courses/', include('courses.urls')),
 ] + static(MEDIA_URL, document_root=MEDIA_ROOT)
 
 if settings.DEBUG:
