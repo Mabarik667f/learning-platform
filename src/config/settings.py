@@ -132,7 +132,13 @@ LOGGING = {
             'encoding': 'utf-8'
         },
     },
-    'loggers': {},
+    'loggers': {
+        'base-logger': {
+            'handlers': ['file'],
+            'propagate': True,
+            'loglevel': 'INFO'
+        }
+    },
 }
 
 # Internationalization
@@ -208,7 +214,7 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 from users.models import User
 from users.serializers import LogoutSerializer, RegisterSerializer, MyTokenObtainPairSerializer
+from users.tasks import get_verify_code
 
 
 class RegisterView(generics.CreateAPIView):
@@ -42,3 +43,11 @@ class LogoutView(generics.CreateAPIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST, data={'error': str(e)})
+
+
+class VerifyCodeView(APIView):
+    permission_classes = (IsAuthenticated, )
+
+    def post(self, request):
+        get_verify_code.delay(request.user.email) #type: ignore
+        return Response(status=status.HTTP_204_NO_CONTENT)

@@ -1,11 +1,17 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-  </div>
+    <div class="home">
+        <img alt="Vue logo" src="../assets/logo.png" />
+    </div>
 </template>
 
 <script lang="ts">
-import { Vue } from "vue-class-component";
+import { defineComponent } from "vue";
 
-export default class HomeView extends Vue {}
+export default defineComponent({
+    setup() {
+        return {};
+    },
+});
 </script>
+
+<style scroped></style>
