@@ -1,6 +1,18 @@
-import { createApp } from 'vue'
-import App from './App.vue'
-import router from './router'
-import store from './store'
+import { createApp, App as VueApp } from "vue";
+import { createPinia } from "pinia";
+import App from "./App.vue";
+import router from "./router";
+import "./style.css";
+import components from "./components/UI/index";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap";
 
-createApp(App).use(store).use(router).mount('#app')
+const app: VueApp = createApp(App);
+const pinia = createPinia();
+
+components.forEach((component) => {
+  const componentName: string = component.name ?? "defaultName";
+  app.component(componentName, component);
+});
+
+app.use(pinia).use(router).mount("#app");

@@ -1,63 +1,45 @@
-version: "3.8"
-
 services:
-  wsgi:
+  asgi:
     build:
-      context: ./src
-      dockerfile: Dockerfile
-    container_name: wsgi
-    command: gunicorn --reload config.wsgi:application --bind 0.0.0.0:8000
-    volumes:
-      - static_volume:/usr/src/app/staticfiles
-      - media_volume:/usr/src/app/media
+      context: .
+      dockerfile: buildfiles/api.Dockerfile
+    container_name: asgi
+    restart: always
     env_file:
-      - ./.env.docker
+      - .env.docker
     networks:
       - web
     depends_on:
-      - db
-      - rabbitmq
       - redis
-    expose:
-      - 8000
+    ports:
+      - "8000:8000"
 
   db:
-    image: postgres
+    image: postgres:alpine
     container_name: db
     env_file:
-      - ./.env.docker
+      - .env.docker
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - web
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis
     container_name: redis
-    env_file:
-      - ./.env.docker
+    env_file: .env.docker
     restart: always
     networks:
       - web
     expose:
       - 6379
 
-  nginx:
-    build:
-      context: .
-      dockerfile: ./nginx/Dockerfile
-    ports:
-      - 80:80
-    depends_on:
-      - wsgi
-    restart: always
-    volumes:
-      - static_volume:/usr/src/app/staticfiles
-      - media_volume:/usr/src/app/media
-    networks:
-      - web
-
-  rabbimq:
+  rabbitmq:
     image: rabbitmq
     ports:
       - 5672:5672
@@ -66,10 +48,30 @@ services:
     networks:
       - web
 
+  nginx:
+    build:
+      context: .
+      dockerfile: buildfiles/frontend.Dockerfile
+    container_name: nginx
+    ports:
+      - 80:80
+    networks:
+      - web
+    depends_on:
+      - asgi
+
+#  frontend:
+#    build:
+#      context: .
+#      dockerfile: buildfiles/frontend.Dockerfile
+#    container_name: frontend
+#    env_file:
+#      .env.docker
+#    networks:
+#      - web
+
 volumes:
   postgres_data:
-  static_volume:
-  media_volume:
 
 networks:
   web:
