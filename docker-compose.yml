@@ -1,5 +1,4 @@
 services:
-<<<<<<< HEAD
   celery:
     build:
       context: ./src
@@ -11,10 +10,7 @@ services:
     networks:
       - web
 
-  wsgi:
-=======
   asgi:
->>>>>>> main
     build:
       context: .
       dockerfile: buildfiles/api.Dockerfile
@@ -53,25 +49,6 @@ services:
       - web
     expose:
       - 6379
-
-<<<<<<< HEAD
-  nginx:
-    build:
-      context: .
-      dockerfile: ./nginx/Dockerfile
-    ports:
-      - 80:80
-    depends_on:
-      - wsgi
-    restart: always
-    volumes:
-      - static_volume:/usr/src/app/staticfiles
-      - media_volume:/usr/src/app/media
-    networks:
-      - web
-
-=======
->>>>>>> main
   rabbitmq:
     image: rabbitmq
     ports:
@@ -80,18 +57,6 @@ services:
     restart: always
     networks:
       - web
-
-  nginx:
-    build:
-      context: .
-      dockerfile: buildfiles/frontend.Dockerfile
-    container_name: nginx
-    ports:
-      - 80:80
-    networks:
-      - web
-    depends_on:
-      - asgi
 
 #  frontend:
 #    build:
