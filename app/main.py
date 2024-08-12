@@ -1,10 +1,12 @@
 import sys
 
-from fastapi import FastAPI
+from fastapi import FastAPI, status
+from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from fastapi import Request
 from starlette.routing import Match
 
+from core.exceptions import CoreValidationError
 from routers import api_router
 from core.config import settings
 from loguru import logger
@@ -53,3 +55,10 @@ async def log_middleware(request: Request, call_next):
 
     response = await call_next(request)
     return response
+
+@app.exception_handler(CoreValidationError)
+def core_validation_exc_handler(request, exc: CoreValidationError):
+    return JSONResponse(
+        status_code=status.HTTP_400_BAD_REQUEST,
+        content={"detail": exc.to_dict()}
+    )

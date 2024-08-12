@@ -1,14 +1,14 @@
-import enum
 from typing import Optional, Annotated, List, get_args
 
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.properties import ForeignKey
 from sqlalchemy.sql.sqltypes import Enum
 from sqlalchemy.util.typing import Literal
+from sqlalchemy import BigInteger, Identity
 
 from core.db import Base
 
-pk = Annotated[int, mapped_column(primary_key=True)]
+pk = Annotated[int, mapped_column(BigInteger, Identity(), primary_key=True)]
 Roles =  Literal["owner", "admin", "user"]
 
 
@@ -48,4 +48,4 @@ class Role(Base):
         validate_strings=True
     ))
 
-    users: Mapped[List["User"]] = relationship(back_populates="role")
+    users: Mapped[List["User"]] = relationship("User", back_populates="role")

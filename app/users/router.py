@@ -34,6 +34,8 @@ async def get_user(session: SessionDep, user_id: int):
 
 @router.post('/create-user', response_model=User, status_code=status.HTTP_201_CREATED)
 async def create_user(session: SessionDep, user: UserCreate) -> Any:
+    logger.info("start")
+    logger.info(user)
     user_obj = await crud.create_user(session=session, user=user)
     return User(**user_obj.__dict__)
 

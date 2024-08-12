@@ -13,7 +13,7 @@ async def create_user(session: AsyncSession, user: UserCreate) -> User | HTTPExc
     user_exists = await user_in_db(session=session, user=user)
 
     if user_exists:
-        raise HTTPException(detail="user exists!", status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(detail={"email": "Пользователь с такой почтой или логином существует!"}, status_code=status.HTTP_400_BAD_REQUEST)
 
     async with session.begin_nested():
         role = await session.execute(select(Role).filter_by(name=user.role))
