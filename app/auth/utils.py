@@ -9,10 +9,12 @@ from users.utils import get_user_by_name
 from mailings.utils import MailingCodeUtils
 from .deps import pwd_context
 
+from loguru import logger
+
 async def auth_user(session: AsyncSession, username: str, password: str) -> User:
     user = await get_user_by_name(session, username)
     if not await verify_password(password, user.hashed_password):
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Неправильный логин или пароль")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"password": "Неправильный логин или пароль"})
     return user
 
 

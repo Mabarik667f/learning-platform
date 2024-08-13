@@ -1,15 +1,17 @@
 <script lang="ts">
+import { LoginForm } from "@/modules/LoginModule";
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  setup() {
-    return {};
-  },
+    components: { LoginForm },
+    setup() {
+        return {};
+    },
 });
 </script>
 
 <template>
-  <div></div>
+    <LoginForm></LoginForm>
 </template>
 
 <style scroped></style>

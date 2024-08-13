@@ -17,4 +17,8 @@ export default defineComponent({
         <slot> </slot>
     </button>
 </template>
-<style scoped></style>
+<style scoped>
+.btn {
+    border: 1px solid black;
+}
+</style>

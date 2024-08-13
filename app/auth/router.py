@@ -9,7 +9,7 @@ from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
 from .crud import create_access_token
 from .utils import auth_user, generate_activation_code
-from .shemas import Token
+from .shemas import Token, VerifyCode
 from mailings.tasks import send_mailing
 from mailings.utils import MailingCodeUtils
 
@@ -25,8 +25,8 @@ router = APIRouter(
 )
 
 @router.patch("/code")
-async def check_mail_code(session: SessionDep, code: str, current_user: CurActiveUserDep):
-    true_code = MailingCodeUtils(current_user.username).check_code(code)
+async def check_mail_code(session: SessionDep, code: VerifyCode, current_user: CurActiveUserDep):
+    true_code = MailingCodeUtils(current_user.username).check_code(code.code)
     if true_code:
        return Response(status_code=status.HTTP_204_NO_CONTENT)
     return Response(status_code=status.HTTP_400_BAD_REQUEST)

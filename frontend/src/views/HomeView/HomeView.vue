@@ -1,15 +1,15 @@
+<template>
+    <div class="home"></div>
+</template>
+
 <script lang="ts">
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  setup() {
-    return {};
-  },
+    setup() {
+        return {};
+    },
 });
 </script>
-
-<template>
-  <div></div>
-</template>
 
 <style scroped></style>

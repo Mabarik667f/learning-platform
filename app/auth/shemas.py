@@ -10,3 +10,7 @@ class TokenData(BaseModel):
     username: Optional[str] = None
     pk: Optional[int] = None
     scopes: list[str] = []
+
+
+class VerifyCode(BaseModel):
+    code: str
