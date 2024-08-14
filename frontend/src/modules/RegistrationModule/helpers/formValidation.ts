@@ -34,7 +34,7 @@ export class RegFormValidator implements RegisterFormInterface {
 
   protected _checkUsername() {
     if (this.username.length < 4) {
-      this.errors["username"].push("Длина Логина должна быть больше 4!");
+      this.errors["username"].push("Длина логина должна быть больше 4!");
     }
   }
 }

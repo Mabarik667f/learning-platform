@@ -48,12 +48,19 @@ export default defineComponent({
         <template v-slot:header> </template>
         <template v-slot:fields>
             <div>
+                <span class="error" v-for="error in errors.username">
+                    {{ error }}</span
+                >
                 <label :for="'username'">Логин</label>
                 <c-input
                     v-model="formData.username"
                     :id="'username'"
                     required
                 />
+
+                <span class="error" v-for="error in errors.password">
+                    {{ error }}</span
+                >
                 <label :for="'password'">Пароль</label>
                 <c-input
                     :id="'password'"

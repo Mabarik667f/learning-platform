@@ -13,8 +13,8 @@ export default async function register(formData: RegisterFormInterface) {
 
   const result = await response.json();
   if (response.ok) {
-    return { data: result, errors: [] };
+    return [];
   } else {
-    return { data: result, errors: result.detail };
+    return result.detail;
   }
 }

@@ -6,10 +6,10 @@ import RegisterButton from "./RegisterButton.vue";
 import { RegisterFormInterface } from "../interfaces/RegisterForm.ts";
 import { RegFormValidator } from "../helpers/formValidation";
 
-import { User, Role } from "@/interfaces/userInterfaces";
 import { ErrorsType } from "@/interfaces/errorsInterfaces";
 
 import errorsIsEmpty from "@/helpers/errorsIsEmpty";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
     name: "reg-form",
@@ -17,11 +17,7 @@ export default defineComponent({
         RegisterButton,
     },
     setup() {
-        const registerData = ref<User>({
-            username: "",
-            email: "",
-            role: Role.Default,
-        });
+        const router = useRouter();
 
         const errors = ref<ErrorsType>({
             username: [],
@@ -41,21 +37,20 @@ export default defineComponent({
                 const validator = new RegFormValidator(formData.value);
                 errors.value = validator.formValidation();
                 if (errorsIsEmpty(errors.value)) {
-                    registerData.value,
-                        (errors.value = await register(formData.value));
+                    errors.value = await register(formData.value);
                 }
+                console.log(errors.value);
                 if (errorsIsEmpty(errors.value)) {
-                    // redirect to login page
+                    router.push("login");
                 } else {
                     formData.value.password = "";
                     formData.value.password2 = "";
-                    console.log(errors.value);
                 }
             } catch (error) {
                 console.log(error);
             }
         };
-        return { formData, registerHook };
+        return { formData, errors, registerHook };
     },
 });
 </script>
@@ -72,6 +67,10 @@ export default defineComponent({
                     required
                 />
 
+                <span class="error" v-for="error in errors.username">
+                    {{ error }}</span
+                >
+
                 <label :for="'email'">Email</label>
                 <c-input
                     :id="'email'"
@@ -80,6 +79,10 @@ export default defineComponent({
                     required
                 />
 
+                <span class="error" v-for="error in errors.email">
+                    {{ error }}</span
+                >
+
                 <label :for="'password'">Пароль</label>
                 <c-input
                     :id="'password'"
@@ -87,6 +90,10 @@ export default defineComponent({
                     v-model="formData.password"
                     required
                 />
+
+                <span class="error" v-for="error in errors.password">
+                    {{ error }}</span
+                >
 
                 <label :for="'password2'">Повтор пароля</label>
                 <c-input

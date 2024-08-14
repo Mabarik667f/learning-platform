@@ -40,7 +40,7 @@ async def get_user_by_name(session: AsyncSession, username: str) -> User:
     if res:
         return res
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"username": "Такого пользователя не существует"})
 
 
 async def get_role_by_name(session: AsyncSession, role_name: str) -> int:

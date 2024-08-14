@@ -9,9 +9,11 @@ export default defineComponent({
     components: { VerifyButton },
     setup() {
         const code = ref<string>("");
+        const error = ref<string>("");
 
         const router = useRouter();
         const store = authStore();
+
         const { setIsAuth } = store;
 
         const verifyHook = async () => {
@@ -19,12 +21,13 @@ export default defineComponent({
                 await verify(code.value);
                 setIsAuth(true);
                 router.push("/");
-            } catch (error) {
-                console.log(error);
+            } catch (e) {
+                console.log(e);
+                error.value = "Неверный код доступа!";
                 code.value = "";
             }
         };
-        return { code, verifyHook };
+        return { code, error, verifyHook };
     },
 });
 </script>
@@ -34,6 +37,7 @@ export default defineComponent({
         <template v-slot:header> </template>
         <template v-slot:fields>
             <div>
+                <span class="error">{{ error }}</span>
                 <c-input v-model="code" required />
             </div>
         </template>
