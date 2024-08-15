@@ -16,7 +16,7 @@ export default defineComponent({
     <form :method="method">
         <slot name="header"></slot>
         <slot name="fields"></slot>
-        <slot name="buttons"></slot>
+        <slot name="footer"></slot>
     </form>
 </template>
 <style scoped></style>

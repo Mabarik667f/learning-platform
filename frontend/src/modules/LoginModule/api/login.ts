@@ -18,6 +18,7 @@ export default async function login(formData: UserLogin) {
     },
     body: bodyData.toString(),
   });
+
   const res = await response.json();
   if (response.ok) {
     return { data: res, errors: [] };

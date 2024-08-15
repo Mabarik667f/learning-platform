@@ -5,7 +5,13 @@ export default defineComponent({});
 </script>
 
 <template>
-    <c-button>Войти</c-button>
+    <c-button class="lg-btn">Войти</c-button>
 </template>
 
-<style scoped></style>
+<style scoped>
+.lg-btn {
+    width: 100%;
+    border-radius: 40px;
+    background: #fff;
+}
+</style>

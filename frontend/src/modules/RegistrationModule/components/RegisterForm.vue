@@ -50,7 +50,7 @@ export default defineComponent({
                 console.log(error);
             }
         };
-        return { formData, errors, registerHook };
+        return { formData, errors, router, registerHook };
     },
 });
 </script>
@@ -104,9 +104,12 @@ export default defineComponent({
                 />
             </div>
         </template>
-        <template v-slot:buttons>
-            <div class="buttons">
+        <template v-slot:footer>
+            <div class="footer">
                 <RegisterButton />
+                <c-button class="btn-primary" @click="router.push('login')"
+                    >Войти</c-button
+                >
             </div>
         </template>
     </c-form>

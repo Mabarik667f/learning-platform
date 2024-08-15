@@ -5,7 +5,7 @@ export default defineComponent({});
 </script>
 
 <template>
-    <c-button>Подтвердить</c-button>
+    <c-button class="btn-primary">Подтвердить</c-button>
 </template>
 
 <style scoped></style>

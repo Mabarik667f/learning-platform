@@ -9,7 +9,7 @@ export default defineComponent({
 </script>
 
 <template>
-    <c-button class="reg-btn">Зарегистрироваться</c-button>
+    <c-button class="reg-btn btn-primary">Зарегистрироваться</c-button>
 </template>
 
 <style scoped>

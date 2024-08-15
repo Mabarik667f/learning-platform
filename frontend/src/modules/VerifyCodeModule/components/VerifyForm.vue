@@ -41,7 +41,7 @@ export default defineComponent({
                 <c-input v-model="code" required />
             </div>
         </template>
-        <template v-slot:buttons>
+        <template v-slot:footer>
             <VerifyButton />
         </template>
     </c-form>

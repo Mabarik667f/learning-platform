@@ -29,6 +29,7 @@ export default defineComponent({
         :value="modelValue"
         :id="id"
         :placeholder="placeholder"
+        class="inp"
         @input="
             $emit(
                 'update:modelValue',
@@ -38,4 +39,22 @@ export default defineComponent({
     />
 </template>
 
-<style scroped></style>
+<style scroped>
+.inp {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    color: inherit;
+    border: none;
+    outline: none;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 40px;
+    color: inherit;
+    padding: 10px 35px 10px 20px;
+}
+
+.inp::placeholder {
+    color: inherit;
+    font-weight: bold;
+}
+</style>
