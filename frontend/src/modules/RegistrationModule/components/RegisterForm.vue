@@ -37,14 +37,17 @@ export default defineComponent({
                 const validator = new RegFormValidator(formData.value);
                 errors.value = validator.formValidation();
                 if (errorsIsEmpty(errors.value)) {
-                    errors.value = await register(formData.value);
-                }
-                console.log(errors.value);
-                if (errorsIsEmpty(errors.value)) {
-                    router.push("login");
-                } else {
-                    formData.value.password = "";
-                    formData.value.password2 = "";
+                    const serverErrors = await register(formData.value);
+                    if (Array.isArray(serverErrors)) {
+                        router.push("login");
+                    } else {
+                        Object.keys(serverErrors).forEach((key) => {
+                            errors.value[key].push(serverErrors[key]);
+                        });
+
+                        formData.value.password = "";
+                        formData.value.password2 = "";
+                    }
                 }
             } catch (error) {
                 console.log(error);
@@ -57,59 +60,74 @@ export default defineComponent({
 
 <template>
     <c-form class="reg-form" @submit.prevent="registerHook">
-        <template v-slot:header> </template>
+        <template v-slot:header>
+            <h1>Регистрация</h1>
+        </template>
         <template v-slot:fields>
-            <div class="fields">
-                <label :for="'username'">Логин</label>
-                <c-input
-                    :id="'username'"
-                    v-model="formData.username"
-                    required
-                />
+            <div class="wrapper">
+                <div class="mb-4">
+                    <cf-label :for="'username'" class="cf-label"
+                        >Логин<span
+                            class="error"
+                            v-for="error in errors.username"
+                        >
+                            {{ error }}</span
+                        ></cf-label
+                    >
+                    <c-input
+                        :id="'username'"
+                        v-model="formData.username"
+                        required
+                    />
+                </div>
 
-                <span class="error" v-for="error in errors.username">
-                    {{ error }}</span
-                >
+                <div class="mb-4">
+                    <cf-label :for="'email'"
+                        >Email
+                        <span class="error" v-for="error in errors.email">
+                            {{ error }}</span
+                        ></cf-label
+                    >
+                    <c-input
+                        :id="'email'"
+                        :type="'email'"
+                        v-model="formData.email"
+                        required
+                    />
+                </div>
 
-                <label :for="'email'">Email</label>
-                <c-input
-                    :id="'email'"
-                    :type="'email'"
-                    v-model="formData.email"
-                    required
-                />
+                <div class="mb-4">
+                    <cf-label :for="'password'">Пароль</cf-label>
+                    <c-input
+                        :id="'password'"
+                        :type="'password'"
+                        v-model="formData.password"
+                        required
+                    />
+                </div>
 
-                <span class="error" v-for="error in errors.email">
-                    {{ error }}</span
-                >
-
-                <label :for="'password'">Пароль</label>
-                <c-input
-                    :id="'password'"
-                    :type="'password'"
-                    v-model="formData.password"
-                    required
-                />
-
-                <span class="error" v-for="error in errors.password">
-                    {{ error }}</span
-                >
-
-                <label :for="'password2'">Повтор пароля</label>
-                <c-input
-                    :id="'password2'"
-                    :type="'password'"
-                    v-model="formData.password2"
-                    required
-                />
+                <div class="mb-5">
+                    <cf-label :for="'password2'">Повтор пароля</cf-label>
+                    <c-input
+                        :id="'password2'"
+                        :type="'password'"
+                        v-model="formData.password2"
+                        required
+                    />
+                    <div class="pass-errors">
+                        <span class="error" v-for="error in errors.password">
+                            {{ error }}</span
+                        >
+                    </div>
+                </div>
             </div>
         </template>
         <template v-slot:footer>
             <div class="footer">
                 <RegisterButton />
-                <c-button class="btn-primary" @click="router.push('login')"
-                    >Войти</c-button
-                >
+                <p class="log-url">
+                    Уже есть аккаунт? <a @click="router.push('login')">Войти</a>
+                </p>
             </div>
         </template>
     </c-form>
@@ -117,8 +135,52 @@ export default defineComponent({
 
 <style scoped>
 .reg-form {
-    display: grid;
-    border: 1px black solid;
-    margin: auto;
+    display: flex;
+    flex-direction: column;
+    background: inherit;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+    color: #fff;
+    width: 420px;
+    height: 700px;
+    padding: 30px 40px;
+    border-radius: 10px;
+}
+
+.pass-errors {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    margin-top: 5px;
+    margin-left: 10px;
+}
+.wrapper {
+    width: 100%;
+}
+
+.cf-label .error {
+    display: block;
+    margin-top: 5px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+a {
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline !important;
+}
+
+.log-url {
+    margin-top: 5px;
+}
+
+.footer {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: space-evenly;
 }
 </style>

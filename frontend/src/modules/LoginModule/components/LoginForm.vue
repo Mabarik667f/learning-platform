@@ -115,10 +115,6 @@ export default defineComponent({
     width: 100%;
 }
 
-h1 {
-    text-align: center;
-}
-
 .auth-input {
     border-radius: 40px;
 }
