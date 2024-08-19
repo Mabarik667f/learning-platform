@@ -41,23 +41,3 @@ async def get_user_by_name(session: AsyncSession, username: str) -> User:
         return res
     else:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"username": "Такого пользователя не существует"})
-
-
-async def get_role_by_name(session: AsyncSession, role_name: str) -> int:
-    q = select(Role.id).where(Role.name == role_name)
-    try:
-        res = await session.execute(q)
-        val = res.scalars().one()
-        return val
-    except NoResultFound:
-        raise HTTPException(status_code=status.http_400_bad_request, detail="Role not found")
-
-
-async def get_role_by_id(session: AsyncSession, role_id: int) -> str:
-    q = select(Role.name).where(Role.id == role_id)
-    try:
-        res = await session.execute(q)
-        val = res.scalars().one()
-        return val
-    except NoResultFound:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Role not found")

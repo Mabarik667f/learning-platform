@@ -6,9 +6,9 @@ from pydantic import BaseModel, EmailStr, Field, validator
 from core.exceptions import CoreValidationError
 
 class RoleEnum(str, Enum):
-    admin = "admin"
-    user = "user"
-    owner = "owner"
+    admin = "ADMIN"
+    user = "USER"
+    owner = "OWNER"
 
 class User(BaseModel):
     username: str

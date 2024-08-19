@@ -1,12 +1,15 @@
 from sqlalchemy.ext.asyncio import create_async_engine
-from sqlalchemy import create_engine
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy import create_engine, BigInteger, Identity
+from sqlalchemy.orm import DeclarativeBase, mapped_column
+from typing import Annotated
 
 from .config import settings
 
 sync_engine = create_engine(str(settings.SYNC_DB_URI), echo=True)
 async_engine = create_async_engine(str(settings.ASYNC_DB_URI), echo=True)
 
+
+pk = Annotated[int, mapped_column(BigInteger, Identity(), primary_key=True)]
 
 class Base(DeclarativeBase):
 

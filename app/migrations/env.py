@@ -10,6 +10,8 @@ from core.config import settings
 #import all models
 
 from users.models import *
+from courses.models import *
+from categories.models import *
 from core.db import Base
 
 # this is the Alembic Config object, which provides
