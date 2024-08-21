@@ -6,6 +6,7 @@ import VerifyCodeView from "@/views/VerifyCodeView/VerifyCodeView.vue";
 import { authStore } from "@/store/authStore";
 import { createPinia, storeToRefs } from "pinia";
 import { RouteLocationNormalized } from "vue-router";
+import Cookies from "js-cookie";
 
 const pinia = createPinia();
 const store = authStore(pinia);
@@ -31,6 +32,18 @@ const userAuth = async (
   next: Function,
 ) => {
   if (isAuth.value) {
+    next("/");
+  } else {
+    next();
+  }
+};
+
+const verifyCode = async (
+  to: RouteLocationNormalized,
+  from: RouteLocationNormalized,
+  next: Function,
+) => {
+  if (!isAuth.value && Cookies.get("access") !== "undefined") {
     next("/");
   } else {
     next();

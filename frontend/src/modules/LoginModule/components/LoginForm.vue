@@ -7,6 +7,7 @@ import errorsIsEmpty from "@/helpers/errorsIsEmpty";
 import login from "../api/login";
 
 import { UserLogin } from "../interfaces/UserLogin";
+import { Tokens } from "../interfaces/Tokens";
 import { ErrorsType } from "@/interfaces/errorsInterfaces";
 
 import LoginButton from "./LoginButton.vue";
@@ -15,7 +16,7 @@ export default defineComponent({
     setup() {
         const router = useRouter();
         const store = authStore();
-        const { setToken } = store;
+        const { setTokens } = store;
 
         const formData = ref<UserLogin>({
             username: "",
@@ -27,14 +28,18 @@ export default defineComponent({
             password: [],
         });
 
-        const accessToken = ref<string>("");
+        const tokens = ref<Tokens>({
+            access_token: "",
+            refresh_token: "",
+        });
+
         const loginHook = async () => {
             const result = await login(formData.value);
             errors.value = result.errors;
-            accessToken.value = result.data.access_token;
+            tokens.value = result.data;
 
             if (errorsIsEmpty(errors.value)) {
-                setToken(accessToken.value);
+                setTokens(tokens.value);
                 router.push("verify-code");
             } else {
                 formData.value.password = "";

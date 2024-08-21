@@ -1,15 +1,16 @@
+import fetchApiV1 from "@/api";
 import { RegisterFormInterface } from "../interfaces/RegisterForm";
 
 export default async function register(formData: RegisterFormInterface) {
-  const response: Response = await fetch("/v1/users/create-user", {
+  const options = {
     method: "POST",
-    body: JSON.stringify({
-      ...formData,
-    }),
     headers: {
       "Content-Type": "application/json",
     },
-  });
+    body: JSON.stringify({ ...formData }),
+  };
+
+  const response: Response = await fetchApiV1("users/create-user", options);
 
   const result = await response.json();
   if (response.ok) {

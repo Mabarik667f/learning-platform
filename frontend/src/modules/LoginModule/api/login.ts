@@ -1,4 +1,5 @@
 import { UserLogin } from "../interfaces/UserLogin";
+import fetchApiV1 from "@/api";
 
 export default async function login(formData: UserLogin) {
   const bodyData = new URLSearchParams();
@@ -11,13 +12,13 @@ export default async function login(formData: UserLogin) {
   bodyData.append("grant_type", "password");
   bodyData.append("scope", "me");
 
-  const response: Response = await fetch("/v1/auth/token", {
+  const options = {
     method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: bodyData.toString(),
-  });
+  };
+
+  const response: Response = await fetchApiV1("auth/token", options);
 
   const res = await response.json();
   if (response.ok) {
