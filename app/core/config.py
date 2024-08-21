@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     BACKEND_CORS: List[str]
     ALGORITHM: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
     SMTP_HOST: str = 'localhost'
     SMTP_PORT: int = 8025

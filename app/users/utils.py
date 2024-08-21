@@ -27,7 +27,7 @@ async def get_user_by_id(session: AsyncSession, user_id) -> User:
     if res:
         return res
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"id": "Такого пользователя не существует"})
 
 
 async def get_user_by_name(session: AsyncSession, username: str) -> User:

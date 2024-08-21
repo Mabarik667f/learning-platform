@@ -1,6 +1,6 @@
 import jwt
 from fastapi.params import Security
-from jwt.exceptions import InvalidTokenError
+from jwt.exceptions import InvalidTokenError, PyJWTError
 
 from fastapi import Depends, status
 from fastapi.security.oauth2 import SecurityScopes
@@ -12,7 +12,8 @@ from datetime import timedelta, datetime, timezone
 from starlette.exceptions import HTTPException
 from core.deps import SessionDep
 from core.config import settings
-from .shemas import TokenData
+from .utils import create_jwt_token
+from .shemas import TokenData, TokenRefresh
 from .deps import OAuth2Dep
 
 from users.models import User
@@ -22,16 +23,17 @@ from users.shemas import UserResponse
 from pydantic import ValidationError
 
 
-async def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
-    return encoded_jwt
+async def create_auth_tokens(data: dict) -> tuple[str, str]:
+    access_token_expire = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    refresh_token_expire = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
 
+    refresh_data = dict(type="refresh")
+    refresh_data.update(data)
+
+    access = await create_jwt_token(data=data, expires_delta=access_token_expire)
+    refresh = await create_jwt_token(data=refresh_data, expires_delta=refresh_token_expire)
+
+    return access, refresh
 
 async def get_current_user(
     session: SessionDep,
@@ -54,6 +56,7 @@ async def get_current_user(
         username: str = payload.get('sub')
         if username is None:
             raise credentials_exception
+
         token_scopes = payload.get("scopes", [])
         token_data = TokenData(scopes=token_scopes, username=username)
     except (InvalidTokenError, ValidationError):
@@ -80,3 +83,17 @@ async def get_current_active_user(
     if not current_user.is_active:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
     return current_user
+
+
+async def refresh_all_tokens(refresh_token: TokenRefresh) -> tuple[str, str]:
+    """Можно сделать blacklist для refresh"""
+    payload = jwt.decode(refresh_token.refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    username: str = payload.get("sub")
+
+    if username is None or payload.get("type") != "refresh":
+        raise PyJWTError
+
+    token_scopes = payload.get("scopes")
+    data = TokenData(username=username, scopes=token_scopes)
+    access, refresh = await create_auth_tokens(data=data.dict())
+    return access, refresh
