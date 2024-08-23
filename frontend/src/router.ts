@@ -1,12 +1,13 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import HomeView from "@/views/HomeView/HomeView.vue";
 import RegisterView from "@/views/RegisterView/RegisterView.vue";
 import LoginView from "@/views/LoginView/LoginView.vue";
 import VerifyCodeView from "@/views/VerifyCodeView/VerifyCodeView.vue";
-import { authStore } from "@/store/authStore";
-import { createPinia, storeToRefs } from "pinia";
 import { RouteLocationNormalized } from "vue-router";
 import Cookies from "js-cookie";
+
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { authStore } from "@/store/authStore";
+import { createPinia, storeToRefs } from "pinia";
 
 const pinia = createPinia();
 const store = authStore(pinia);

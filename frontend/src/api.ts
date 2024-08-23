@@ -2,8 +2,13 @@ import Cookies from "js-cookie";
 import { Tokens } from "@/modules/LoginModule";
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { authStore } from "@/store/authStore";
+import { createPinia } from "pinia";
 
 const router = useRouter();
+const store = authStore(createPinia());
+
+const { setTokens, clearCookies } = store;
 
 export default async function fetchApiV1(
   endpoint: string,
@@ -61,7 +66,9 @@ async function refresh_token() {
 
   if (response.ok) {
     tokens.value = data;
+    setTokens(tokens.value);
   } else {
+    clearCookies();
     router.push("login");
   }
 }
