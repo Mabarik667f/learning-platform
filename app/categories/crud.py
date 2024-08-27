@@ -1,11 +1,11 @@
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import delete, select
+from sqlalchemy import delete, func, select
 from loguru import logger
 
-from categories.models import Category as CategoryModel
-
+from .utils import get_courses_with_single_or_few_categories
+from .models import Category as CategoryModel, CourseHasCategory
 from .shemas import CreateCategory, UpdateCategory
 
 """
@@ -16,7 +16,6 @@ async def create_category(session: AsyncSession, category: CreateCategory) -> Ca
 
     category_obj = CategoryModel(
         title=category.title,
-        slug=category.slug
     )
     session.add(category_obj)
     try:
@@ -31,12 +30,10 @@ async def create_category(session: AsyncSession, category: CreateCategory) -> Ca
 async def update_category(
     session: AsyncSession,
     category_data: UpdateCategory,
-    category_id: int | None=None,
-    category_slug: str | None=None) -> CategoryModel:
+    category_id: int,
+) -> CategoryModel:
 
-    category_obj = await get_category(session,
-        category_id=category_id,
-        category_slug=category_slug)
+    category_obj = await get_category(session, category_id)
 
     category_dict = category_data.dict(exclude_unset=True)
     for key, val in category_dict.items():
@@ -53,35 +50,35 @@ async def update_category(
 
 async def delete_category(
     session: AsyncSession,
-    category_id: int | None=None,
-    category_slug: str | None=None) -> None:
+    category_id: int) -> None:
 
-    category_obj = await get_category(session,
-        category_slug=category_slug,
-        category_id=category_id)
+    category_obj = await get_category(session,category_id)
 
-    if category_id:
-        q = delete(CategoryModel).where(CategoryModel.id == category_id)
-    else:
-        q = delete(CategoryModel).where(CategoryModel.slug == category_slug)
+    async with session.begin_nested():
 
-    await session.execute(q)
-    await session.commit()
+        empty_courses_ids = await get_courses_with_single_or_few_categories(session, category_id)
+
+        if empty_courses_ids:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="У одного или нескольких курсов это единственная категория!"
+            )
+
+        await session.execute(delete(CourseHasCategory)
+            .where(CourseHasCategory.category_id == category_id)
+        )
+
+        await session.delete(category_obj)
+        await session.commit()
 
 
 async def get_category(
     session: AsyncSession,
-    category_id: int | None=None,
-    category_slug: str | None=None) -> CategoryModel:
+    category_id: int
+) -> CategoryModel:
 
-    if category_id:
-        q = select(CategoryModel).where(CategoryModel.id == category_id)
-        detail = {"id": "Объект не найден"}
-    elif category_slug:
-        q = select(CategoryModel).where(CategoryModel.slug == category_slug)
-        detail = {"slug": "Объект не найден"}
-    else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="no params for by get method")
+    q = select(CategoryModel).where(CategoryModel.id == category_id)
+    detail = {"id": "Объект не найден"}
 
     res = await session.execute(q)
     res = res.scalar_one_or_none()
