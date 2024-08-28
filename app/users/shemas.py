@@ -62,3 +62,8 @@ class UserResponse(UserAllData):
 
 class Profile(BaseModel):
     user: User
+
+
+
+class Cart(BaseModel):
+    pass

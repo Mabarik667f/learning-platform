@@ -36,3 +36,8 @@ class Profile(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
 
     user: Mapped["User"] = relationship(back_populates="profile")
+
+
+
+class Cart:
+    pass

@@ -3,7 +3,6 @@ from fastapi.exceptions import HTTPException
 from loguru import logger
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from typing import Any
 
 from users.models import Profile, User, Role
 from users.shemas import UserAllData, UserCreate, UserUpdate
@@ -56,14 +55,13 @@ async def update_user_data(session: AsyncSession, user_id: int, update_data: Use
 
 
 async def delete_user(session: AsyncSession, user_id: int) -> None:
-    user = await get_user_by_id(session, user_id)
+    user_obj = await get_user_by_id(session, user_id)
 
-    user_data = user.to_dict()
+    user_data = user_obj.to_dict()
     user = UserAllData(**user_data)
 
     if user.is_superuser or user.role == 'owner':
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User is owner or superuser!")
 
-    q = delete(User).where(User.id == user_id)
-    await session.execute(q)
+    await session.delete(user_obj)
     await session.commit()
