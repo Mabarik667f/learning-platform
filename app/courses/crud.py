@@ -10,7 +10,7 @@ from categories.utils import get_list_categories
 from collections.abc import Sequence
 
 from .models import Course as CourseModel
-from .shemas import CreateCourse, UpdateCourse
+from .shemas import CourseListQueryParams, CreateCourse, UpdateCourse
 
 from loguru import logger
 
@@ -60,7 +60,7 @@ async def get_course(session: AsyncSession, course_id: int) -> CourseModel:
     try:
         res = res.scalar_one()
         return res
-    except NoResultFound as e:
+    except NoResultFound:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"id": "Курс не найден!"})
 
 
@@ -72,8 +72,23 @@ async def get_course_selectionload(session: AsyncSession, course_id: int) -> Cou
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"course": "Курс не найден !"})
 
 
-async def get_list_course(session: AsyncSession, *args, **kwargs) -> Sequence:
-    # add quering
-    res = await session.execute(select(CourseModel))
-    res = res.all()
-    return res
+async def get_list_course(session: AsyncSession, params: CourseListQueryParams) -> Sequence:
+    q = select(CourseModel)
+    logger.info(params)
+
+    if params.min_price is not None:
+        q = q.filter(CourseModel.price >= params.min_price)
+
+    if params.max_price is not None:
+        q = q.filter(CourseModel.price <= params.max_price)
+
+    if params.difficulties is not None:
+        q = q.filter(CourseModel.difficulty.in_(params.difficulties))
+    if params.categories:
+        q = q.filter(CourseModel.id.in_(
+            select(CourseHasCategory.course_id)
+            .filter(CourseHasCategory.category_id.in_(params.categories))
+        ))
+    logger.info(q)
+    res = await session.execute(q)
+    return res.all()

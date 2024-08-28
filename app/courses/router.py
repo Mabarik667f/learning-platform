@@ -6,8 +6,10 @@ from categories.utils import get_categories_by_ids
 from categories.shemas import Category
 from users.deps import CurActiveUserDep
 from core.deps import SessionDep
-from .shemas import (AddCategoryToCourse, CourseAllData, CourseResponse, CourseWithCategories,
+from .shemas import (AddCategoriesToCourse, CourseAllData,
+    CourseListQueryParams, CourseResponse, CourseWithCategories,
     CreateCourse, UpdateCourse)
+from .deps import ListQueryParamsDp
 from .utils import add_categories_to_course, del_category
 from . import crud
 
@@ -60,12 +62,9 @@ async def delete(
 async def get_list(
     session: SessionDep,
     *,
-    difficulty: str | None = Query(None),
-    min_price: int | None = Query(None),
-    max_price: int | None = Query(None),
-    categories: list[str] = Query(None)
+    params: CourseListQueryParams = ListQueryParamsDp
 ) -> list[CourseResponse]:
-    courses = await crud.get_list_course(session)
+    courses = await crud.get_list_course(session, params)
     return [CourseResponse(**course[0].to_dict()) for course in courses]
 
 
@@ -78,10 +77,10 @@ async def get(
     return CourseResponse(**course.to_dict())
 
 
-
 @router.delete('/delete-category/{course_id}/{category_id}')
 async def delete_category(
     session: SessionDep,
+    current_user: CurActiveUserDep,
     course_id: int,
     category_id: int
 ) -> CourseWithCategories:
@@ -95,8 +94,9 @@ async def delete_category(
 @router.patch('/add-categories/{course-id}')
 async def add_categories(
     session: SessionDep,
+    current_user: CurActiveUserDep,
     course_id: int,
-    added_categories: AddCategoryToCourse
+    added_categories: AddCategoriesToCourse
 ):
     course = await add_categories_to_course(session, course_id, category_ids=added_categories.category_ids)
     categories_row = await get_categories_by_ids(session, course.categories)

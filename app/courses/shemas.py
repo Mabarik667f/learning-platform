@@ -22,7 +22,7 @@ class UpdateCourse(CourseBase):
     pass
 
 
-class AddCategoryToCourse(BaseModel):
+class AddCategoriesToCourse(BaseModel):
     category_ids: list[int]
 
 
@@ -39,3 +39,10 @@ class CourseResponse(CourseBase):
 class CourseAllData(CourseResponse):
     categories: list[Category]
     sections: list[Section] | None = None
+
+
+class CourseListQueryParams(BaseModel):
+    difficulties: list[Difficulty] | None = None
+    min_price: int | None = None
+    max_price: int | None = None
+    categories: list[int] | None = None
