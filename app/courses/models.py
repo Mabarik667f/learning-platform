@@ -9,8 +9,8 @@ from core.db import Base, pk
 if TYPE_CHECKING:
     from categories.models import CourseHasCategory
 
-class Difficulty(Enum):
-    EASY = 'easy',
+class Difficulty(str, Enum):
+    EASY = "easy",
     MEDIUM = "medium",
     HARD = "hard"
 
@@ -18,8 +18,8 @@ class Course(Base):
     __tablename__ = "course"
 
     id: Mapped[pk]
-    name: Mapped[str] = mapped_column(String(50))
-    text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    title: Mapped[str] = mapped_column(String(50))
+    describe: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[int] = mapped_column(Integer, CheckConstraint("price >= 0"), nullable=False)
     img: Mapped[str] = mapped_column(String, nullable=False)
     difficulty: Mapped[Difficulty] = mapped_column(SqlEnum(Difficulty, name="difficulty_enum", create_type=False),
@@ -33,7 +33,7 @@ class Section(Base):
 
     id: Mapped[pk]
     title: Mapped[str] = mapped_column(String(50))
-    text: Mapped[str | None] = mapped_column(Text, nullable=True)
+    describe: Mapped[str | None] = mapped_column(Text, nullable=True)
     course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"))
 
     course: Mapped["Course"] = relationship(back_populates="sections")
