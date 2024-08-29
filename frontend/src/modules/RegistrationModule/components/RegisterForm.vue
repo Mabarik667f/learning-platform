@@ -76,6 +76,7 @@ export default defineComponent({
                     >
                     <c-input
                         :id="'username'"
+                        :placeholder="'Логин'"
                         v-model="formData.username"
                         required
                     />
@@ -91,6 +92,7 @@ export default defineComponent({
                     <c-input
                         :id="'email'"
                         :type="'email'"
+                        :placeholder="'Email'"
                         v-model="formData.email"
                         required
                     />
@@ -101,6 +103,7 @@ export default defineComponent({
                     <c-input
                         :id="'password'"
                         :type="'password'"
+                        :placeholder="'Пароль'"
                         v-model="formData.password"
                         required
                     />
@@ -111,6 +114,7 @@ export default defineComponent({
                     <c-input
                         :id="'password2'"
                         :type="'password'"
+                        :placeholder="'Повтор пароля'"
                         v-model="formData.password2"
                         required
                     />

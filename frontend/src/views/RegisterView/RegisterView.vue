@@ -10,9 +10,17 @@ export default defineComponent({
 </script>
 
 <template>
-    <div class="register">
+    <div class="con">
         <RegisterForm />
     </div>
 </template>
 
-<style scroped></style>
+<style scroped>
+.con {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+</style>

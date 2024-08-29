@@ -11,7 +11,17 @@ export default defineComponent({
 </script>
 
 <template>
-    <LoginForm></LoginForm>
+    <div class="con">
+        <LoginForm></LoginForm>
+    </div>
 </template>
 
-<style scroped></style>
+<style scroped>
+.con {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+</style>

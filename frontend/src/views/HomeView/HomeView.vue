@@ -1,7 +1,11 @@
 <template>
     <div class="home">
-        <SearchField />
-        <FilterBar />
+        <div class="search-con">
+            <SearchField />
+        </div>
+        <div class="filters-con">
+            <FilterBar />
+        </div>
     </div>
 </template>
 
@@ -24,6 +28,24 @@ export default defineComponent({
 <style scoped>
 .home {
     display: flex;
-    flex: 1;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.search-con {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+}
+
+.filters-con {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 0;
+    width: 100%;
 }
 </style>

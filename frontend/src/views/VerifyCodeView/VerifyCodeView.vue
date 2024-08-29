@@ -13,7 +13,17 @@ export default defineComponent({
 </script>
 
 <template>
-    <VerifyForm></VerifyForm>
+    <div class="con">
+        <VerifyForm></VerifyForm>
+    </div>
 </template>
 
-<style scroped></style>
+<style scroped>
+.con {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+</style>

@@ -16,7 +16,7 @@ export default defineComponent({
 
 <style scoped>
 .search-btn {
-    width: 30% !important;
+    width: 100px !important;
     height: 100% !important;
     border: none !important;
     box-shadow: none !important;

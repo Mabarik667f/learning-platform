@@ -48,7 +48,7 @@ export default defineComponent({
                 <c-input
                     class="code"
                     maxlength="6"
-                    :placeholder="123456"
+                    :placeholder="'123456'"
                     pattern="\d{6}"
                     v-model="code"
                     required

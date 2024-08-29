@@ -28,9 +28,13 @@ a {
     padding: 0;
     box-sizing: border-box;
 }
+html,
 body {
+    height: 100%;
     margin: 0;
-    background: url("@assets/images/background.jpg") no-repeat;
+}
+body {
+    /* background: url("@assets/images/background.jpg") no-repeat; */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -76,6 +80,8 @@ button:focus-visible {
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
+    height: 100%;
+    width: 100%;
 }
 
 @media (prefers-color-scheme: light) {
