@@ -1,3 +1,4 @@
+from loguru import logger
 from core.config import settings
 
 class MailingCodeUtils:
