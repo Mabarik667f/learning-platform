@@ -21,6 +21,7 @@ export default defineComponent({
 .search {
     display: flex;
     align-items: center;
+    align-self: flex-start;
     position: relative;
     height: 7vh;
     padding: 5px;
