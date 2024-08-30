@@ -72,9 +72,8 @@ async def get_course_selectionload(session: AsyncSession, course_id: int) -> Cou
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"course": "Курс не найден !"})
 
 
-async def get_list_course(session: AsyncSession, params: CourseListQueryParams) -> Sequence:
+async def get_list_course(session: AsyncSession, params: CourseListQueryParams) -> Sequence[CourseModel]:
     q = select(CourseModel)
-    logger.info(params)
 
     if params.min_price is not None:
         q = q.filter(CourseModel.price >= params.min_price)
@@ -89,6 +88,5 @@ async def get_list_course(session: AsyncSession, params: CourseListQueryParams) 
             select(CourseHasCategory.course_id)
             .filter(CourseHasCategory.category_id.in_(params.categories))
         ))
-    logger.info(q)
     res = await session.execute(q)
-    return res.all()
+    return res.scalars().all()

@@ -65,7 +65,7 @@ async def get_list(
     params: CourseListQueryParams = ListQueryParamsDp
 ) -> list[CourseResponse]:
     courses = await crud.get_list_course(session, params)
-    return [CourseResponse(**course[0].to_dict()) for course in courses]
+    return [CourseResponse(**course.to_dict()) for course in courses]
 
 
 @router.get('/{course_id}')
@@ -87,7 +87,7 @@ async def delete_category(
     course = await del_category(session, course_id, category_id)
     categories_row = await get_categories_by_ids(session, course.categories)
 
-    categories = [Category(**category[0].to_dict()) for category in categories_row]
+    categories = [Category(**category.to_dict()) for category in categories_row]
     return CourseWithCategories(**course.to_dict(), categories=categories)
 
 
@@ -101,5 +101,5 @@ async def add_categories(
     course = await add_categories_to_course(session, course_id, category_ids=added_categories.category_ids)
     categories_row = await get_categories_by_ids(session, course.categories)
 
-    categories = [Category(**category[0].to_dict()) for category in categories_row]
+    categories = [Category(**category.to_dict()) for category in categories_row]
     return CourseWithCategories(**course.to_dict(), categories=categories)

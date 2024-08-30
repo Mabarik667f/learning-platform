@@ -36,8 +36,8 @@ async def get_courses_with_single_or_few_categories(session: AsyncSession, categ
 async def get_categories_by_ids(
     session: AsyncSession,
     course_has_category: list[CourseHasCategory]
-)-> Sequence[Row[tuple[Category]]]:
+)-> Sequence[Category]:
     q = (select(Category)
         .where(Category.id.in_(c.category_id for c in course_has_category)))
     res = await session.execute(q)
-    return res.all()
+    return res.scalars().all()

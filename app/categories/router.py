@@ -44,3 +44,12 @@ async def get(session: SessionDep,
 
     category_obj = await crud.get_category(session, category_id)
     return CategoryResponse(**category_obj.to_dict())
+
+
+@router.get('/list')
+async def list(
+    session: SessionDep,
+) -> list[CategoryResponse]:
+    categories = await crud.get_list_categories(session)
+    logger.info(categories)
+    return [CategoryResponse(**cat.to_dict()) for cat in categories]

@@ -1,8 +1,9 @@
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import delete, func, select
+from sqlalchemy import delete, func, select, Row
 from loguru import logger
+from collections.abc import Sequence
 
 from .utils import get_courses_with_single_or_few_categories
 from .models import Category as CategoryModel, CourseHasCategory
@@ -84,4 +85,13 @@ async def get_category(
     res = res.scalar_one_or_none()
     if not res:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=detail)
+    return res
+
+
+async def get_list_categories(
+    session: AsyncSession
+) -> Sequence[CategoryModel]:
+    res = await session.execute(select(CategoryModel))
+    res = res.scalars().all()
+    logger.info(res)
     return res
