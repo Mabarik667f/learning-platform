@@ -1,6 +1,7 @@
 <script lang="ts">
-import { PropType } from "vue";
-import { defineComponent } from "vue";
+import { PropType, ref } from "vue";
+import { defineComponent, SetupContext } from "vue";
+import { updateSingleVal } from "@modules/FiltersModule";
 
 export default defineComponent({
     props: {
@@ -18,16 +19,23 @@ export default defineComponent({
         idSecond: {
             type: String as PropType<string>,
         },
-        modelValueFirst: {
-            required: true,
-            default: "",
-            type: [String, Number] as PropType<string | number>,
-        },
-        modelValueSecond: {
-            required: true,
-            default: "",
-            type: [String, Number] as PropType<string | number>,
-        },
+    },
+    emits: ["updateVal1", "updateVal2"],
+    setup(props, { emit }: SetupContext) {
+        const postfix = ref<string>("");
+        const modelVal1 = ref<string>("");
+        const modelVal2 = ref<string>("");
+
+        const handleInp = async (event: Event, model: string) => {
+            if (model == "model1") {
+                postfix.value = "Val1";
+            } else {
+                postfix.value = "Val2";
+            }
+            await updateSingleVal(event, modelVal1.value, emit, postfix.value);
+        };
+
+        return { modelVal1, modelVal2, handleInp };
     },
 });
 </script>
@@ -39,14 +47,16 @@ export default defineComponent({
             <c-input
                 :placeholder="'От'"
                 :type="type"
-                v-model="modelValueFirst"
+                v-model="modelVal1"
                 :id="idFirst"
+                @input="handleInp($event, 'model1')"
             />
             <c-input
                 :placeholder="'До'"
                 :type="type"
-                v-model="modelValueSecond"
+                v-model="modelVal2"
                 :id="idSecond"
+                @input="handleInp($event, 'model2')"
             />
         </div>
     </div>

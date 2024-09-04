@@ -20,6 +20,7 @@ export default defineComponent({
             type: [String, Number] as PropType<string | number>,
         },
     },
+    emits: ["update:modelValue"],
 });
 </script>
 

@@ -1,4 +1,4 @@
 export interface Prices {
-  minPrice: number;
-  maxPrice: number;
+  minPrice: number | string;
+  maxPrice: number | string;
 }

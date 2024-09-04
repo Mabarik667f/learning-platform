@@ -1,6 +1,7 @@
 <script lang="ts">
-import { PropType } from "vue";
+import { PropType, ref, SetupContext } from "vue";
 import { defineComponent } from "vue";
+import { updateSingleVal } from "@modules/FiltersModule";
 
 export default defineComponent({
     props: {
@@ -19,11 +20,15 @@ export default defineComponent({
         id: {
             type: String as PropType<string>,
         },
-        modelValue: {
-            required: true,
-            default: "",
-            type: [String, Number] as PropType<string | number>,
-        },
+    },
+    emits: ["updateFilterInp"],
+    setup(props, { emit }: SetupContext) {
+        const modelVal = ref<string>("");
+
+        const handleInp = async (event: Event) => {
+            await updateSingleVal(event, modelVal.value, emit);
+        };
+        return { modelVal, handleInp };
     },
 });
 </script>
@@ -34,8 +39,9 @@ export default defineComponent({
         <c-input
             :placeholder="placeholder"
             :type="type"
-            v-model="modelValue"
+            v-model="modelVal"
             :id="id"
+            @input="handleInp($event)"
         />
     </div>
 </template>

@@ -6,6 +6,7 @@ import { Prices } from "../interfaces/Prices";
 import FilterInp from "./FilterInp.vue";
 import FilterBetween from "./FilterBetween.vue";
 import FilterList from "./FilterList.vue";
+import ApplyButton from "./ApplyButton.vue";
 import { onMounted } from "vue";
 import { getDifficulties } from "@modules/CoursesModule";
 
@@ -14,20 +15,36 @@ export default defineComponent({
         FilterInp,
         FilterBetween,
         FilterList,
+        ApplyButton,
     },
     setup() {
         const categories = ref<FilterOption[]>([]);
         const difficulties = ref<FilterOption[]>([]);
         const queryCat = ref<string>("");
         const prices = ref<Prices>({
-            minPrice: 0,
-            maxPrice: 0,
+            minPrice: "",
+            maxPrice: "",
         });
         onMounted(async () => {
             categories.value = await getCategories();
             difficulties.value = await getDifficulties();
         });
-        return { categories, difficulties, queryCat, prices };
+
+        const handleSingleInp = (newVal: any, model: string) => {
+            console.log(newVal, model);
+            switch (model) {
+                case "queryCat":
+                    queryCat.value = newVal;
+                    break;
+                case "minPrice":
+                    prices.value.minPrice = newVal;
+                    break;
+                case "maxPrice":
+                    prices.value.maxPrice = newVal;
+                    break;
+            }
+        };
+        return { categories, difficulties, queryCat, prices, handleSingleInp };
     },
 });
 </script>
@@ -35,6 +52,7 @@ export default defineComponent({
 <template>
     <div class="filter-bar">
         <h3>Фильтры</h3>
+        <ApplyButton />
         {{ categories }}
         {{ difficulties }}
         <FilterBetween
@@ -42,8 +60,8 @@ export default defineComponent({
             :type="'number'"
             :idFirst="'min-price'"
             :idSecond="'max-price'"
-            :modelValueFirst="prices.minPrice"
-            :modelValueSecond="prices.maxPrice"
+            @updateVal1="handleSingleInp($event, 'minPrice')"
+            @updateVal2="handleSingleInp($event, 'maxPrice')"
         />
         <FilterList
             :header="'Сложность'"
@@ -55,7 +73,7 @@ export default defineComponent({
             <FilterInp
                 :header="'Категория'"
                 :id="'search-cat'"
-                :modelValue="queryCat"
+                @updateFilterInp="handleSingleInp($event, 'queryCat')"
             />
             <FilterList
                 :id="'categories'"
@@ -71,5 +89,7 @@ export default defineComponent({
     display: flex;
     flex-direction: column;
     background: #6d8a51;
+    border-radius: 20px;
+    padding: 10px;
 }
 </style>
