@@ -8,6 +8,7 @@ from core.db import Base, pk
 
 if TYPE_CHECKING:
     from categories.models import CourseHasCategory
+    from users.models import Cart
 
 class Difficulty(str, Enum):
     EASY = "easy",
@@ -18,7 +19,7 @@ class Course(Base):
     __tablename__ = "course"
 
     id: Mapped[pk]
-    title: Mapped[str] = mapped_column(String(50), unique=True, index=True)
+    title: Mapped[str] = mapped_column(String(50))
     describe: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[int] = mapped_column(Integer, CheckConstraint("price >= 0"), nullable=False)
     img: Mapped[str] = mapped_column(String, nullable=False)
@@ -26,6 +27,7 @@ class Course(Base):
         nullable=False)
 
     categories: Mapped[List["CourseHasCategory"]] = relationship(back_populates="course")
+    users: Mapped[List["Cart"]] = relationship(back_populates="course")
     sections: Mapped[List["Section"]] = relationship(back_populates="course")
 
 class Section(Base):

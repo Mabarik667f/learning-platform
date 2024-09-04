@@ -1,4 +1,4 @@
-from typing import Optional, Annotated, List, get_args
+from typing import TYPE_CHECKING, Optional, Annotated, List, get_args
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.properties import ForeignKey
 from sqlalchemy.util.typing import Literal
@@ -6,6 +6,10 @@ from sqlalchemy import Enum as SqlEnum
 from enum import Enum
 
 from core.db import Base, pk
+
+
+if TYPE_CHECKING:
+    from courses.models import Course
 
 class Role(str, Enum):
     OWNER = "OWNER"
@@ -36,8 +40,15 @@ class Profile(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
 
     user: Mapped["User"] = relationship(back_populates="profile")
+    courses: Mapped[list["Course"]] = relationship(back_populates="user")
 
 
+class Cart(Base):
+    __tablename__ = "cart"
 
-class Cart:
-    pass
+    user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"), primary_key=True)
+    course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"), primary_key=True)
+    is_selected: Mapped[bool] = mapped_column(default=False)
+
+    user: Mapped["User"] = relationship(back_populates="courses")
+    course: Mapped["Course"] = relationship(back_populates="users")
