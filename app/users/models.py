@@ -31,6 +31,7 @@ class User(Base):
     role: Mapped[Role] = mapped_column(SqlEnum(Role, name="role_enum", create_type=False), nullable=False, default=Role.USER)
 
     profile: Mapped[Optional["Profile"]] = relationship(back_populates="user")
+    courses: Mapped[list["Cart"]] = relationship(back_populates="user")
 
 
 class Profile(Base):
@@ -40,7 +41,6 @@ class Profile(Base):
     user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
 
     user: Mapped["User"] = relationship(back_populates="profile")
-    courses: Mapped[list["Course"]] = relationship(back_populates="user")
 
 
 class Cart(Base):
