@@ -29,7 +29,6 @@ async def me(current_user: CurActiveUserDep):
 @router.get('/{user_id}', response_model=UserResponse)
 async def get_user(session: SessionDep, user_id: int):
     user = await crud.get_user_by_id(session, user_id)
-    logger.info(user)
     return UserResponse(**user.to_dict())
 
 

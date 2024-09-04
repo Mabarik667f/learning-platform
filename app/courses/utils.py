@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 
 from . import crud
-from .models import Course
+from .models import Course, Difficulty
 from categories.models import Category, CourseHasCategory
 from loguru import logger
 
@@ -48,3 +48,8 @@ async def del_category(session: AsyncSession, course_id: int, category_id: int) 
         return course
     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
         detail={"course": "У курса должна быть хотя бы 1 категория"})
+
+
+
+async def get_all_difficulties(session: AsyncSession) -> list[Difficulty]:
+    return [df for df in Difficulty]

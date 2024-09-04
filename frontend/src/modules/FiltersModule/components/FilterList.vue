@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { PropType } from "vue";
+import { FilterOption } from "../interfaces/FilterOption";
 
 export default defineComponent({
     props: {
@@ -13,7 +14,7 @@ export default defineComponent({
         },
         options: {
             required: true,
-            type: Array as PropType<Array<object>>,
+            type: Array as PropType<Array<FilterOption>>,
         },
         modelValue: {
             required: true,
@@ -29,8 +30,26 @@ export default defineComponent({
         <span v-if="header">
             {{ header }}
         </span>
-        <select></select>
+        <ul class="filter-options">
+            <li
+                v-for="option in options"
+                :key="option.id ? option.id : option.title"
+            >
+                <c-input :type="'checkbox'" />
+                <span>{{ option.title }}</span>
+            </li>
+        </ul>
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.filter-options {
+    list-style: none;
+}
+
+.filter-options li {
+    display: flex;
+    flex-direction: row;
+    margin: 5px;
+}
+</style>

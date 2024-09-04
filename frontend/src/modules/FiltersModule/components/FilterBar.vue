@@ -1,10 +1,13 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import { getCategories, Category } from "@/modules/CategoriesModule";
+import { getCategories } from "@/modules/CategoriesModule";
+import { FilterOption } from "../interfaces/FilterOption";
+import { Prices } from "../interfaces/Prices";
 import FilterInp from "./FilterInp.vue";
 import FilterBetween from "./FilterBetween.vue";
 import FilterList from "./FilterList.vue";
 import { onMounted } from "vue";
+import { getDifficulties } from "@modules/CoursesModule";
 
 export default defineComponent({
     components: {
@@ -13,11 +16,18 @@ export default defineComponent({
         FilterList,
     },
     setup() {
-        const categories = ref<Category[]>([]);
+        const categories = ref<FilterOption[]>([]);
+        const difficulties = ref<FilterOption[]>([]);
+        const queryCat = ref<string>("");
+        const prices = ref<Prices>({
+            minPrice: 0,
+            maxPrice: 0,
+        });
         onMounted(async () => {
             categories.value = await getCategories();
+            difficulties.value = await getDifficulties();
         });
-        return { categories };
+        return { categories, difficulties, queryCat, prices };
     },
 });
 </script>
@@ -26,18 +36,19 @@ export default defineComponent({
     <div class="filter-bar">
         <h3>Фильтры</h3>
         {{ categories }}
+        {{ difficulties }}
         <FilterBetween
             :header="'Цена'"
             :type="'number'"
             :idFirst="'min-price'"
             :idSecond="'max-price'"
-            :modelValueFirst="minPrice"
-            :modelValueSecond="maxPrice"
+            :modelValueFirst="prices.minPrice"
+            :modelValueSecond="prices.maxPrice"
         />
         <FilterList
             :header="'Сложность'"
             :id="'diffuculty'"
-            :options="[]"
+            :options="difficulties"
             :modelValue="difficulties"
         />
         <div>
@@ -48,7 +59,7 @@ export default defineComponent({
             />
             <FilterList
                 :id="'categories'"
-                :options="[]"
+                :options="categories"
                 :modelValue="categories"
             />
         </div>

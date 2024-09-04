@@ -18,7 +18,7 @@ class Course(Base):
     __tablename__ = "course"
 
     id: Mapped[pk]
-    title: Mapped[str] = mapped_column(String(50))
+    title: Mapped[str] = mapped_column(String(50), unique=True, index=True)
     describe: Mapped[str | None] = mapped_column(Text, nullable=True)
     price: Mapped[int] = mapped_column(Integer, CheckConstraint("price >= 0"), nullable=False)
     img: Mapped[str] = mapped_column(String, nullable=False)

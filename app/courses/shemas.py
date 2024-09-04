@@ -46,3 +46,7 @@ class CourseListQueryParams(BaseModel):
     min_price: int | None = None
     max_price: int | None = None
     categories: list[int] | None = None
+
+
+class CourseDifficulty(BaseModel):
+    title: Difficulty | str

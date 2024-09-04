@@ -18,7 +18,6 @@ async def create_user(session: AsyncSession, user: UserCreate) -> User:
     async with session.begin_nested():
 
         password_hash = await get_password_hash(user.password)
-        logger.info(user.role.value)
         user_obj = User(
             username=user.username,
             email=user.email,

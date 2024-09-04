@@ -6,11 +6,11 @@ from categories.utils import get_categories_by_ids
 from categories.shemas import Category
 from users.deps import CurActiveUserDep
 from core.deps import SessionDep
-from .shemas import (AddCategoriesToCourse, CourseAllData,
+from .shemas import (AddCategoriesToCourse, CourseAllData, CourseDifficulty,
     CourseListQueryParams, CourseResponse, CourseWithCategories,
     CreateCourse, UpdateCourse)
 from .deps import ListQueryParamsDp
-from .utils import add_categories_to_course, del_category
+from .utils import add_categories_to_course, del_category, get_all_difficulties
 from . import crud
 
 from loguru import logger
@@ -49,23 +49,24 @@ async def delete(
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 
-# @router.get('/all-data/{course_id}')
-# async def get_all_data(
-#     session: SessionDep,
-#     course_id: int
-# ) -> CourseAllData:
-#     course = await crud.get_course(session, course_id)
-#     return CourseAllData(**course.to_dict())
-
-
 @router.get("/list")
 async def get_list(
     session: SessionDep,
     *,
-    params: CourseListQueryParams = ListQueryParamsDp
+    params: CourseListQueryParams = ListQueryParamsDp,
+    limit: int = Query(10),
+    offset: int = Query(0)
 ) -> list[CourseResponse]:
-    courses = await crud.get_list_course(session, params)
+    courses = await crud.get_list_course(session, params, limit, offset)
     return [CourseResponse(**course.to_dict()) for course in courses]
+
+
+@router.get("/all-difficulties")
+async def get_difficulties(
+    session: SessionDep
+) -> list[CourseDifficulty]:
+    difficulties = await get_all_difficulties(session)
+    return [CourseDifficulty(title=df.title()) for df in difficulties]
 
 
 @router.get('/{course_id}')
@@ -97,7 +98,7 @@ async def add_categories(
     current_user: CurActiveUserDep,
     course_id: int,
     added_categories: AddCategoriesToCourse
-):
+) -> CourseWithCategories:
     course = await add_categories_to_course(session, course_id, category_ids=added_categories.category_ids)
     categories_row = await get_categories_by_ids(session, course.categories)
 
