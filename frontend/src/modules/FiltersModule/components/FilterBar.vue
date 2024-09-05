@@ -20,6 +20,10 @@ export default defineComponent({
     setup() {
         const categories = ref<FilterOption[]>([]);
         const difficulties = ref<FilterOption[]>([]);
+
+        const selectedCats = ref<FilterOption[]>([]);
+        const selectedDifficulties = ref<FilterOption[]>([]);
+
         const queryCat = ref<string>("");
         const prices = ref<Prices>({
             minPrice: "",
@@ -31,7 +35,6 @@ export default defineComponent({
         });
 
         const handleSingleInp = (newVal: any, model: string) => {
-            console.log(newVal, model);
             switch (model) {
                 case "queryCat":
                     queryCat.value = newVal;
@@ -44,7 +47,27 @@ export default defineComponent({
                     break;
             }
         };
-        return { categories, difficulties, queryCat, prices, handleSingleInp };
+
+        const handleListUpdate = (values: FilterOption[], model: string) => {
+            switch (model) {
+                case "category":
+                    selectedCats.value = values;
+                    break;
+                case "difficulty":
+                    selectedDifficulties.value = values;
+                    break;
+            }
+        };
+        return {
+            categories,
+            difficulties,
+            selectedCats,
+            selectedDifficulties,
+            queryCat,
+            prices,
+            handleSingleInp,
+            handleListUpdate,
+        };
     },
 });
 </script>
@@ -53,8 +76,8 @@ export default defineComponent({
     <div class="filter-bar">
         <h3>Фильтры</h3>
         <ApplyButton />
-        {{ categories }}
-        {{ difficulties }}
+        {{ selectedCats }}
+        {{ selectedDifficulties }}
         <FilterBetween
             :header="'Цена'"
             :type="'number'"
@@ -65,9 +88,9 @@ export default defineComponent({
         />
         <FilterList
             :header="'Сложность'"
-            :id="'diffuculty'"
+            :id="'difficulty'"
             :options="difficulties"
-            :modelValue="difficulties"
+            @updateListVal="handleListUpdate($event, 'difficulty')"
         />
         <div>
             <FilterInp
@@ -78,7 +101,7 @@ export default defineComponent({
             <FilterList
                 :id="'categories'"
                 :options="categories"
-                :modelValue="categories"
+                @updateListVal="handleListUpdate($event, 'category')"
             />
         </div>
     </div>
