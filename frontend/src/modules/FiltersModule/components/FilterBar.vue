@@ -131,6 +131,7 @@ export default defineComponent({
             :header="'Сложность'"
             :id="'difficulty'"
             :options="difficulties"
+            :queryList="selectedDifficulties"
             @updateListVal="handleListUpdate($event, 'difficulty')"
         />
         <div>
@@ -143,6 +144,7 @@ export default defineComponent({
             <FilterList
                 :id="'categories'"
                 :options="categories"
+                :queryList="selectedCats"
                 @updateListVal="handleListUpdate($event, 'category')"
             />
         </div>

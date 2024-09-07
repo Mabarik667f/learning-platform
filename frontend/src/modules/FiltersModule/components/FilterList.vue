@@ -16,6 +16,10 @@ export default defineComponent({
             required: true,
             type: Array as PropType<Array<FilterOption>>,
         },
+        queryList: {
+            default: () => [],
+            type: Array as PropType<Array<FilterOption>>,
+        },
     },
     emits: ["updateListVal"],
     setup(props, { emit }: SetupContext) {
@@ -31,6 +35,18 @@ export default defineComponent({
                     options.value = newOptions;
                     toggleOptions.value = newOptions.map(() => false);
                 }
+            },
+        );
+
+        watch(
+            () => props.queryList,
+            (newQueryList: FilterOption[]) => {
+                toggleOptions.value = options.value.map((option) =>
+                    newQueryList.some(
+                        (queryOpt) => queryOpt.title === option.title,
+                    ),
+                );
+                selectedOptions.value = newQueryList;
             },
         );
 
@@ -71,6 +87,7 @@ export default defineComponent({
             >
                 <c-input
                     :type="'checkbox'"
+                    :checked="toggleOptions[i]"
                     @input="toggle($event, i)"
                     v-model="toggleOptions[i]"
                 />
