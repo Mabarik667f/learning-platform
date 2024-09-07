@@ -2,6 +2,8 @@
 import { PropType, ref, SetupContext } from "vue";
 import { defineComponent } from "vue";
 import { updateSingleVal } from "@modules/FiltersModule";
+import { useRoute } from "vue-router";
+import { watch } from "vue";
 
 export default defineComponent({
     props: {
@@ -20,10 +22,20 @@ export default defineComponent({
         id: {
             type: String as PropType<string>,
         },
+        queryVal: {
+            default: "",
+            type: String as PropType<string>,
+        },
     },
     emits: ["updateFilterInp"],
     setup(props, { emit }: SetupContext) {
         const modelVal = ref<string>("");
+        watch(
+            () => props.queryVal,
+            (newQuery: string) => {
+                modelVal.value = newQuery;
+            },
+        );
 
         const handleInp = async (event: Event) => {
             await updateSingleVal(event, modelVal.value, emit);

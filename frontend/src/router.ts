@@ -56,7 +56,7 @@ const routes: Array<RouteRecordRaw> = [
     path: "/",
     name: "home",
     component: HomeView,
-    beforeEnter: authGuard,
+    props: {},
   },
   {
     path: "/register",

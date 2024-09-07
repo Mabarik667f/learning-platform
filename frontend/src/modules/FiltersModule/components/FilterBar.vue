@@ -1,4 +1,5 @@
 <script lang="ts">
+import { useRouter, useRoute } from "vue-router";
 import { defineComponent, ref } from "vue";
 import { getCategories } from "@/modules/CategoriesModule";
 import { FilterOption } from "../interfaces/FilterOption";
@@ -9,6 +10,7 @@ import FilterList from "./FilterList.vue";
 import ApplyButton from "./ApplyButton.vue";
 import { onMounted } from "vue";
 import { getDifficulties } from "@modules/CoursesModule";
+import { getQueryParams, updateRouteQueryParams } from "../helpers/queryParams";
 
 export default defineComponent({
     components: {
@@ -18,6 +20,9 @@ export default defineComponent({
         ApplyButton,
     },
     setup() {
+        const router = useRouter();
+        const route = useRoute();
+
         const categories = ref<FilterOption[]>([]);
         const difficulties = ref<FilterOption[]>([]);
 
@@ -29,9 +34,31 @@ export default defineComponent({
             minPrice: "",
             maxPrice: "",
         });
+
         onMounted(async () => {
             categories.value = await getCategories();
             difficulties.value = await getDifficulties();
+
+            const queryDifficulties: string[] =
+                (route.query.difficulties as string)?.split(",") || [];
+
+            const categoryIds: number[] =
+                (route.query.categories as string)
+                    ?.split(",")
+                    .map((id) => Number(id)) || [];
+
+            selectedCats.value =
+                categories.value.filter((cat) =>
+                    categoryIds.includes(Number(cat.id)),
+                ) || [];
+            selectedDifficulties.value =
+                difficulties.value.filter((diff) =>
+                    queryDifficulties.includes(diff.title),
+                ) || [];
+
+            queryCat.value = (route.query.queryCat as string) || "";
+            prices.value.minPrice = (route.query.minPrice as string) || "";
+            prices.value.maxPrice = (route.query.maxPrice as string) || "";
         });
 
         const handleSingleInp = (newVal: any, model: string) => {
@@ -57,6 +84,17 @@ export default defineComponent({
                     selectedDifficulties.value = values;
                     break;
             }
+            updateRoute();
+        };
+
+        const updateRoute = () => {
+            const queryParams = getQueryParams(
+                prices.value,
+                queryCat.value,
+                selectedDifficulties.value,
+                selectedCats.value,
+            );
+            updateRouteQueryParams(router, queryParams);
         };
         return {
             categories,
@@ -67,6 +105,7 @@ export default defineComponent({
             prices,
             handleSingleInp,
             handleListUpdate,
+            updateRoute,
         };
     },
 });
@@ -75,7 +114,7 @@ export default defineComponent({
 <template>
     <div class="filter-bar">
         <h3>Фильтры</h3>
-        <ApplyButton />
+        <ApplyButton @click="updateRoute" />
         {{ selectedCats }}
         {{ selectedDifficulties }}
         <FilterBetween
@@ -85,6 +124,8 @@ export default defineComponent({
             :idSecond="'max-price'"
             @updateVal1="handleSingleInp($event, 'minPrice')"
             @updateVal2="handleSingleInp($event, 'maxPrice')"
+            :queryVal1="prices.minPrice"
+            :queryVal2="prices.maxPrice"
         />
         <FilterList
             :header="'Сложность'"
@@ -96,6 +137,7 @@ export default defineComponent({
             <FilterInp
                 :header="'Категория'"
                 :id="'search-cat'"
+                :queryVal="queryCat"
                 @updateFilterInp="handleSingleInp($event, 'queryCat')"
             />
             <FilterList

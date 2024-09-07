@@ -23,6 +23,7 @@ export default defineComponent({
         const selectedOptions = ref<FilterOption[]>([]);
         const toggleOptions = ref<boolean[]>([]);
 
+        // добавить checbox для выбранных
         watch(
             () => props.options,
             (newOptions: FilterOption[]) => {

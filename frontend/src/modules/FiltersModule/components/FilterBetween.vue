@@ -1,5 +1,5 @@
 <script lang="ts">
-import { PropType, ref } from "vue";
+import { PropType, ref, watch } from "vue";
 import { defineComponent, SetupContext } from "vue";
 import { updateSingleVal } from "@modules/FiltersModule";
 
@@ -19,12 +19,33 @@ export default defineComponent({
         idSecond: {
             type: String as PropType<string>,
         },
+        queryVal1: {
+            default: "",
+            type: [String, Number] as PropType<string | number>,
+        },
+        queryVal2: {
+            default: "",
+            type: [String, Number] as PropType<string | number>,
+        },
     },
     emits: ["updateVal1", "updateVal2"],
     setup(props, { emit }: SetupContext) {
         const postfix = ref<string>("");
         const modelVal1 = ref<string>("");
         const modelVal2 = ref<string>("");
+
+        watch(
+            () => props.queryVal1,
+            (newVal: string | number) => {
+                modelVal1.value = String(newVal);
+            },
+        );
+        watch(
+            () => props.queryVal2,
+            (newVal: string | number) => {
+                modelVal2.value = String(newVal);
+            },
+        );
 
         const handleInp = async (event: Event, model: string) => {
             if (model == "model1") {
