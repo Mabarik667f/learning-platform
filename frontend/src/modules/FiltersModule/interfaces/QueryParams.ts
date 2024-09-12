@@ -1,7 +1,8 @@
 export interface QueryParams {
-  minPrice?: string | number;
-  maxPrice?: string | number;
+  min_price?: string | number;
+  max_price?: string | number;
   queryCat?: string;
   difficulties?: string;
   categories?: string;
+  [key: string]: any;
 }

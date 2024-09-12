@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useRouter, useRoute } from "vue-router";
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import { getCategories } from "@/modules/CategoriesModule";
 import { FilterOption } from "../interfaces/FilterOption";
 import { Prices } from "../interfaces/Prices";
@@ -10,6 +10,7 @@ import FilterList from "./FilterList.vue";
 import ApplyButton from "./ApplyButton.vue";
 import { onMounted } from "vue";
 import { getDifficulties } from "@modules/CoursesModule";
+import { getCourseList } from "@modules/CoursesModule";
 import { getQueryParams, updateRouteQueryParams } from "../helpers/queryParams";
 
 export default defineComponent({
@@ -31,21 +32,22 @@ export default defineComponent({
 
         const queryCat = ref<string>("");
         const prices = ref<Prices>({
-            minPrice: "",
-            maxPrice: "",
+            min_price: "",
+            max_price: "",
         });
 
-        onMounted(async () => {
+        onMounted(async () => await updateQueryParams());
+
+        const updateQueryParams = async () => {
             categories.value = await getCategories();
             difficulties.value = await getDifficulties();
 
             const queryDifficulties: string[] =
-                (route.query.difficulties as string)?.split(",") || [];
+                (route.query.difficulties as string[]) || [];
 
             const categoryIds: number[] =
-                (route.query.categories as string)
-                    ?.split(",")
-                    .map((id) => Number(id)) || [];
+                (route.query.categories as string[])?.map((id) => Number(id)) ||
+                [];
 
             selectedCats.value =
                 categories.value.filter((cat) =>
@@ -57,9 +59,11 @@ export default defineComponent({
                 ) || [];
 
             queryCat.value = (route.query.queryCat as string) || "";
-            prices.value.minPrice = (route.query.minPrice as string) || "";
-            prices.value.maxPrice = (route.query.maxPrice as string) || "";
-        });
+            prices.value.min_price = (route.query.min_price as string) || "";
+            prices.value.max_price = (route.query.max_price as string) || "";
+
+            await getCourseList(route.fullPath);
+        };
 
         const handleSingleInp = (newVal: any, model: string) => {
             switch (model) {
@@ -67,15 +71,18 @@ export default defineComponent({
                     queryCat.value = newVal;
                     break;
                 case "minPrice":
-                    prices.value.minPrice = newVal;
+                    prices.value.min_price = newVal;
                     break;
                 case "maxPrice":
-                    prices.value.maxPrice = newVal;
+                    prices.value.max_price = newVal;
                     break;
             }
         };
 
-        const handleListUpdate = (values: FilterOption[], model: string) => {
+        const handleListUpdate = async (
+            values: FilterOption[],
+            model: string,
+        ) => {
             switch (model) {
                 case "category":
                     selectedCats.value = values;
@@ -84,18 +91,25 @@ export default defineComponent({
                     selectedDifficulties.value = values;
                     break;
             }
-            updateRoute();
+            await updateRoute();
         };
 
-        const updateRoute = () => {
+        const updateRoute = async () => {
             const queryParams = getQueryParams(
                 prices.value,
                 queryCat.value,
                 selectedDifficulties.value,
                 selectedCats.value,
             );
-            updateRouteQueryParams(router, queryParams);
+            await updateRouteQueryParams(router, queryParams);
         };
+
+        watch(
+            () => route.fullPath,
+            async (newPath: string) => {
+                await getCourseList(newPath);
+            },
+        );
         return {
             categories,
             difficulties,
@@ -124,8 +138,8 @@ export default defineComponent({
             :idSecond="'max-price'"
             @updateVal1="handleSingleInp($event, 'minPrice')"
             @updateVal2="handleSingleInp($event, 'maxPrice')"
-            :queryVal1="prices.minPrice"
-            :queryVal2="prices.maxPrice"
+            :queryVal1="prices.min_price"
+            :queryVal2="prices.max_price"
         />
         <FilterList
             :header="'Сложность'"

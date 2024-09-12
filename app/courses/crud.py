@@ -79,7 +79,6 @@ async def get_list_course(
     offset: int
 ) -> Sequence[CourseModel]:
     q = select(CourseModel)
-
     if params.min_price is not None:
         q = q.filter(CourseModel.price >= params.min_price)
 
@@ -93,5 +92,6 @@ async def get_list_course(
             select(CourseHasCategory.course_id)
             .filter(CourseHasCategory.category_id.in_(params.categories))
         ))
-    res = await session.execute(q.limit(limit).offset(offset))
+    # add limit + offset
+    res = await session.execute(q)
     return res.scalars().all()

@@ -6,7 +6,6 @@ export default async function updateSingleVal(
   emit: SetupContext["emit"],
   postfix: String = "FilterInp",
 ) {
-  console.log(`update${postfix}`);
   emit(
     `update${postfix}`,
     (event.target as HTMLInputElement).value,

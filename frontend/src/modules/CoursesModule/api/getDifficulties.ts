@@ -16,7 +16,10 @@ export default async function getDifficulties(): Promise<FilterOption[]> {
   const data = await response.json();
 
   try {
-    return data as FilterOption[];
+    const res: FilterOption[] = data.map((item: FilterOption) => ({
+      title: item.title.toLowerCase(),
+    }));
+    return res;
   } catch (error) {
     return [];
     console.log(error);

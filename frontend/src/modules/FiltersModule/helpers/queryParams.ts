@@ -10,23 +10,32 @@ export const getQueryParams = (
   categories: FilterOption[],
 ): QueryParams => {
   const queryParams: QueryParams = {
-    minPrice: prices.minPrice || undefined,
-    maxPrice: prices.maxPrice || undefined,
+    min_price: prices.min_price !== "" ? Number(prices.min_price) : undefined,
+    max_price: prices.max_price !== "" ? Number(prices.max_price) : undefined,
     queryCat: queryCat || undefined,
     difficulties: difficulties.length
-      ? difficulties.map((df) => df.title).join(",")
+      ? difficulties.map((df) => df.title).join("&")
       : undefined,
     categories: categories.length
-      ? categories.map((cat) => cat.id).join(",")
+      ? categories.map((cat) => cat.id).join("&")
       : undefined,
   };
   return queryParams;
 };
-export const updateRouteQueryParams = (router: Router, params: QueryParams) => {
-  console.log(params);
+export const updateRouteQueryParams = async (
+  router: Router,
+  params: QueryParams,
+) => {
+  const query = {
+    min_price: params.min_price,
+    max_price: params.max_price,
+    queryCat: params.queryCat,
+    difficulties: params.difficulties?.split("&"),
+    categories: params.categories?.split("&"),
+  };
   router.push({
-    query: {
-      ...params,
-    },
+    query: query,
   });
+
+  return query;
 };
