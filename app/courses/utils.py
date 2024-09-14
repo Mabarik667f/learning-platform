@@ -6,8 +6,8 @@ from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 
 from . import crud
-from .models import Course, Difficulty
-from categories.models import Category, CourseHasCategory
+from models.courses import Course, Difficulty
+from models.categories import Category, CourseHasCategory
 from loguru import logger
 
 

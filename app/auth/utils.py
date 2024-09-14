@@ -7,7 +7,7 @@ from fastapi import status
 from fastapi.exceptions import HTTPException
 
 from core.config import settings
-from users.models import User
+from models.users import User
 from users.utils import get_user_by_name
 from mailings.utils import MailingCodeUtils
 from .deps import pwd_context

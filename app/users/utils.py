@@ -3,7 +3,7 @@ from sqlalchemy import update, select, delete, or_
 from fastapi import status
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
-from users.models import User, Role
+from models.users import User
 from users.shemas import UserCreate
 
 """

@@ -4,7 +4,7 @@ from loguru import logger
 from sqlalchemy import select, delete
 from sqlalchemy.ext.asyncio.session import AsyncSession
 
-from users.models import Profile, User, Role
+from models.users import Profile, User
 from users.shemas import UserAllData, UserCreate, UserUpdate
 from users.utils import user_in_db, get_user_by_id
 from auth.utils import get_password_hash

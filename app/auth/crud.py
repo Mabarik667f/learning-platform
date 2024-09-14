@@ -16,7 +16,7 @@ from .utils import create_jwt_token
 from .shemas import TokenData, TokenRefresh
 from .deps import OAuth2Dep
 
-from users.models import User
+from models.users import User
 from users.utils import get_user_by_name
 from users.shemas import UserResponse
 

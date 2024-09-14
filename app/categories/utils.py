@@ -4,7 +4,7 @@ from fastapi import status, HTTPException
 from sqlalchemy import Row
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.sql import select, func
-from categories.models import Category, CourseHasCategory
+from models.categories import Category, CourseHasCategory
 
 
 async def get_list_categories(session: AsyncSession, category_ids: Iterable[list[int]]) -> Sequence[Category]:

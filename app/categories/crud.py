@@ -6,7 +6,7 @@ from loguru import logger
 from collections.abc import Sequence
 
 from .utils import get_courses_with_single_or_few_categories
-from .models import Category as CategoryModel, CourseHasCategory
+from models.categories import Category as CategoryModel, CourseHasCategory
 from .shemas import CreateCategory, UpdateCategory
 
 """

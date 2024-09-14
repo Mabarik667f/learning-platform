@@ -7,8 +7,8 @@ from sqlalchemy.sql.sqltypes import Text
 from core.db import Base, pk
 
 if TYPE_CHECKING:
-    from categories.models import CourseHasCategory
-    from users.models import Cart
+    from .categories import CourseHasCategory
+    from .users import Cart
 
 class Difficulty(str, Enum):
     EASY = "easy",

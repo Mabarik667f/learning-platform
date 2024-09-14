@@ -1,5 +1,6 @@
 from fastapi import Depends, Query
-from .shemas import CourseListQueryParams, Difficulty
+from models.courses import Difficulty
+from .shemas import CourseListQueryParams
 
 
 async def get_list_query_params(

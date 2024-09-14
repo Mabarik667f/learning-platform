@@ -58,7 +58,6 @@ async def get_list(
     offset: int = Query(0)
 ) -> list[CourseResponse]:
     courses = await crud.get_list_course(session, params, limit, offset)
-    logger.info(courses)
     return [CourseResponse(**course.to_dict()) for course in courses]
 
 

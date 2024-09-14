@@ -5,11 +5,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql import select
 
-from categories.models import Category, CourseHasCategory
+from models.categories import Category, CourseHasCategory
+from models.courses import Course as CourseModel
 from categories.utils import get_list_categories
 from collections.abc import Sequence
 
-from .models import Course as CourseModel
 from .shemas import CourseListQueryParams, CreateCourse, UpdateCourse
 
 from loguru import logger

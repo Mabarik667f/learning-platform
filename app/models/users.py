@@ -9,7 +9,7 @@ from core.db import Base, pk
 
 
 if TYPE_CHECKING:
-    from courses.models import Course
+    from .courses import Course
 
 class Role(str, Enum):
     OWNER = "OWNER"
