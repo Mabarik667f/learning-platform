@@ -9,9 +9,9 @@ from core.config import settings
 
 #import all models
 
-from users.models import *
-from courses.models import *
-from categories.models import *
+from models.users import *
+from models.courses import *
+from models.categories import *
 from core.db import Base
 
 # this is the Alembic Config object, which provides

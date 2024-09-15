@@ -32,11 +32,11 @@ class Settings(BaseSettings):
     SQL_PORT: int = 5432
 
 
-    TEST_POSTGRES_PASSWORD: str
-    TEST_POSTGRES_USER: str
-    TEST_POSTGRES_DB: str
-    TEST_POSTGRES_HOST: str
-    TEST_POSTGRES_PORT: int = 5432
+    TEST_SQL_PASSWORD: str
+    TEST_SQL_USER: str
+    TEST_SQL_DB: str
+    TEST_SQL_HOST: str
+    TEST_SQL_PORT: int = 5432
 
     @property
     def ASYNC_DB_URI(self):
@@ -44,7 +44,7 @@ class Settings(BaseSettings):
 
     @property
     def TEST_ASYNC_DB_URI(self):
-        return f"postgresql+asyncpg://{self.TEST_POSTGRES_USER}:{self.TEST_POSTGRES_PASSWORD}@{self.TEST_POSTGRES_HOST}:{self.TEST_POSTGRES_PORT}/{self.TEST_POSTGRES_DB}"
+        return f"postgresql+asyncpg://{self.TEST_SQL_USER}:{self.TEST_SQL_PASSWORD}@{self.TEST_SQL_HOST}:{self.TEST_SQL_PORT}/{self.TEST_SQL_DB}"
 
     @property
     def SYNC_DB_URI(self):
