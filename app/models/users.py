@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional, Annotated, List, get_args
+from typing import TYPE_CHECKING, Optional
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.properties import ForeignKey
 from sqlalchemy.util.typing import Literal
@@ -9,7 +9,7 @@ from core.db import Base, pk
 
 
 if TYPE_CHECKING:
-    from .courses import Course
+    from .courses import Course, Submission
 
 class Role(str, Enum):
     OWNER = "OWNER"
@@ -32,6 +32,7 @@ class User(Base):
 
     profile: Mapped[Optional["Profile"]] = relationship(back_populates="user")
     courses: Mapped[list["Cart"]] = relationship(back_populates="user")
+    submissions: Mapped[list["Submission"]] = relationship(back_populates="user")
 
 
 class Profile(Base):

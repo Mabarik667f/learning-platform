@@ -1,14 +1,15 @@
 from enum import Enum
 from typing import TYPE_CHECKING, List
-from sqlalchemy import CheckConstraint, Integer, String, Enum as SqlEnum
+from sqlalchemy import CheckConstraint, Integer, String, Enum as SqlEnum, DateTime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.properties import ForeignKey
 from sqlalchemy.sql.sqltypes import Text
 from core.db import Base, pk
+from datetime import datetime
 
 if TYPE_CHECKING:
     from .categories import CourseHasCategory
-    from .users import Cart
+    from .users import Cart, User
 
 class Difficulty(str, Enum):
     EASY = "easy",
@@ -50,29 +51,28 @@ class Subsection(Base):
     section_id: Mapped[int] = mapped_column(ForeignKey("section.id", ondelete="CASCADE"))
 
     section: Mapped["Section"] = relationship(back_populates="subsections")
-    content_sections: Mapped[List['ContentSection']] = relationship(back_populates="subsection")
+    tasks: Mapped[List['Task']] = relationship(back_populates="subsection")
 
 
-class ContentSection(Base):
-    __tablename__ = "content_section"
+class Task(Base):
+    __tablename__ = "task"
 
     id: Mapped[pk]
     text: Mapped[str | None] = mapped_column(Text, nullable=True)
     video: Mapped[str] = mapped_column(String, nullable=False)
+
+    todo: Mapped[bool] = mapped_column(default=False)
+    scores: Mapped[int] = mapped_column(CheckConstraint("scores > 0"), nullable=False)
+
+    task_type_id: Mapped[int] = mapped_column(ForeignKey("task_type.id", ondelete="RESTRICT"))
     subsection_id: Mapped[int] = mapped_column(ForeignKey("subsection.id", ondelete="CASCADE"))
 
-    subsection: Mapped["Subsection"] = relationship(back_populates="content_sections")
-    questions: Mapped[List["Question"]] = relationship(back_populates="content_section")
+    subsection: Mapped["Subsection"] = relationship(back_populates="tasks")
+    task_type: Mapped["TaskType"] = relationship(back_populates="tasks")
 
-class Question(Base):
-    __tablename__ = "question"
-
-    id: Mapped[pk]
-    text: Mapped[str] = mapped_column(Text)
-    content_section_id: Mapped[int] = mapped_column(ForeignKey("content_section.id", ondelete="CASCADE"))
-
-    content_section: Mapped["ContentSection"] = relationship(back_populates="questions")
-    answers: Mapped[List["Answer"]] = relationship(back_populates="question")
+    answers: Mapped[list["Answer"]] = relationship(back_populates="task")
+    task_tests: Mapped[list["TaskTest"]] = relationship(back_populates="task")
+    submissions: Mapped[list["Submission"]] = relationship(back_populates="task")
 
 class Answer(Base):
     __tablename__ = "answer"
@@ -80,6 +80,41 @@ class Answer(Base):
     id: Mapped[pk]
     text: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_correct: Mapped[bool] = mapped_column(default=False)
-    question_id: Mapped[int] = mapped_column(ForeignKey("question.id", ondelete="CASCADE"))
+    task_id: Mapped[int] = mapped_column(ForeignKey("task.id", ondelete="CASCADE"))
 
-    question: Mapped["Question"] = relationship(back_populates="answers")
+    task: Mapped["Task"] = relationship(back_populates="answers")
+
+class TaskTest(Base):
+    __tablename__ = "task_test"
+
+    id: Mapped[pk]
+    expected_output: Mapped[str] = mapped_column(Text)
+    input: Mapped[str] = mapped_column(Text)
+
+    task_id: Mapped[int] = mapped_column(ForeignKey("task.id", ondelete="CASCADE"))
+
+    task: Mapped["Task"] = relationship(back_populates="task_tests")
+
+
+class TaskType(Base):
+    __tablename__ = "task_type"
+
+    id: Mapped[pk]
+    name: Mapped[str]
+
+    tasks: Mapped[list["Task"]] = relationship(back_populates="task_type")
+
+
+class Submission(Base):
+    __tablename__ = "submission"
+
+    submission_id: Mapped[pk]
+    task_id: Mapped[int] = mapped_column(ForeignKey("task.id", ondelete="CASCADE"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("user_account.id", ondelete="CASCADE"))
+
+    submission_date: Mapped[str] = mapped_column(DateTime, default=datetime.utcnow)
+    submission_code: Mapped[str] = mapped_column(Text)
+    submission_answer: Mapped[str] = mapped_column(Text)
+
+    user: Mapped["User"] = relationship(back_populates="submissions")
+    task: Mapped["Task"] = relationship(back_populates="submissions")

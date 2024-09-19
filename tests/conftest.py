@@ -9,22 +9,26 @@ from core.db import Base
 from core.config import settings
 from main import app
 from loguru import logger
-
+from .helpers.auth_middleware import BearerAuth
 
 async_engine = create_async_engine(str(settings.TEST_ASYNC_DB_URI))
 async_session_maker = async_sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
 
+default_user_data: dict = {
+    "email": "aboba@gmail.com",
+    "username": "Test",
+    "password": "+Password447",
+    "password2": "+Password447",
+    "scope": ["me"]}
+
+
 async def connection() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         try:
-            logger.info("START")
             yield session
         except:
-            logger.info("ERROR")
-            await session.rollback()
             raise
         finally:
-            logger.info("FINALLY")
             await session.rollback()
             await session.close()
 
@@ -48,7 +52,19 @@ def event_loop(request):
     loop.close()
 
 
+@pytest.fixture(scope="class")
+async def create_user():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client: #type: ignore
+        await client.post("/users/create-user", json=default_user_data)
+
+
 @pytest.fixture
 async def client():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client: #type: ignore
+    auth = BearerAuth(app, user=default_user_data)
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test", auth=auth) as client: #type: ignore
         yield client
+
+
+@pytest.fixture(scope="class")
+async def create_course(client: AsyncClient):
+    pass
