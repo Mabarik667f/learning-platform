@@ -38,7 +38,6 @@ async def delete(session: SessionDep, category_id: int, current_user: CurActiveU
 
 @router.get('/get/{category_id}')
 async def get(session: SessionDep,
-    current_user: CurActiveUserDep,
     category_id: int
 ) -> CategoryResponse:
 

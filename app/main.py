@@ -40,18 +40,18 @@ if settings.BACKEND_CORS:
 
 @app.middleware("http")
 async def log_middleware(request: Request, call_next):
-    logger.debug(f"{request.method} {request.url}")
-    routes = request.app.router.routes
-    logger.debug("Params:")
-    for route in routes:
-        match, scope = route.matches(request)
-        if match == Match.FULL:
-            for name, val in scope["path_params"].items():
-                logger.debug(f"\t{name}: {val}")
+    if settings.REQUESTS_LOGGIN_MIDDLEWARE:
+        logger.debug(f"{request.method} {request.url}")
+        routes = request.app.router.routes
+        for route in routes:
+            match, scope = route.matches(request)
+            if match == Match.FULL:
+                for name, val in scope["path_params"].items():
+                    logger.debug(f"\t{name}: {val}")
 
-    logger.debug("Headers:")
-    for name, val in request.headers.items():
-        logger.debug(f"\t{name}: {val}")
+        logger.debug("Headers:")
+        for name, val in request.headers.items():
+            logger.debug(f"\t{name}: {val}")
 
     response = await call_next(request)
     return response

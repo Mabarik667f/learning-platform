@@ -66,5 +66,6 @@ class Settings(BaseSettings):
     SUPERUSER_USERNAME: str
     SUPERUSER_EMAIL: str
     SUPERUSER_PASSWORD: str
+    REQUESTS_LOGGIN_MIDDLEWARE: bool = False
 
 settings = Settings() # type: ignore

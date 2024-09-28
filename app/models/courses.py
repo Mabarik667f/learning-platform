@@ -47,7 +47,6 @@ class Subsection(Base):
 
     id: Mapped[pk]
     title: Mapped[str] = mapped_column(String(50))
-    number: Mapped[int]
     section_id: Mapped[int] = mapped_column(ForeignKey("section.id", ondelete="CASCADE"))
 
     section: Mapped["Section"] = relationship(back_populates="subsections")
