@@ -23,3 +23,7 @@ class BearerAuth(httpx.Auth):
             response = await client.post("/auth/token", data=self.user)
             token_data = response.json()
             return token_data.get('access_token')
+
+
+def get_auth_header(auth_token: str):
+    return {"Authorization": f"Bearer {auth_token}"}

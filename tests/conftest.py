@@ -11,7 +11,7 @@ import core #type: ignore
 from core.db import Base #type: ignore
 from core.config import settings #type: ignore
 from main import app #type: ignore
-from .helpers.auth_middleware import BearerAuth
+from .helpers.auth_middleware import BearerAuth, get_auth_header
 
 from loguru import logger
 
@@ -38,7 +38,7 @@ async def connection() -> AsyncGenerator[AsyncSession, None]:
 
 app.dependency_overrides[core.deps.get_db] = connection
 
-@pytest.fixture(scope="class", autouse=True)
+@pytest.fixture(scope="module", autouse=True)
 async def setup():
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
@@ -57,28 +57,31 @@ def event_loop(request):
     loop.close()
 
 
-@pytest.fixture(scope="class")
+@pytest.fixture(scope="module")
 async def create_user():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client: #type: ignore
         await client.post("/users/create-user", json=default_user_data)
 
-
-@pytest.fixture
+@pytest.fixture(scope="module")
 async def client():
-    auth = BearerAuth(app, user=default_user_data)
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test", auth=auth) as client: #type: ignore
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client: #type: ignore
         yield client
+
+@pytest.fixture(scope="module")
+async def token(client):
+    auth = BearerAuth(app, user=default_user_data)
+    yield await auth.async_get_token()
 
 
 @pytest.fixture()
-async def create_categories(client: AsyncClient):
+async def create_categories(client: AsyncClient, token: str):
     categories = ["Python", "Rust", "Algorithms"]
     for cat in categories:
-        await client.post("/categories/create", json={"title": cat})
+        await client.post("/categories/create", json={"title": cat}, headers=get_auth_header(token))
 
 
 @pytest.fixture
-async def create_course(client: AsyncClient, create_categories):
+async def create_course(client: AsyncClient, create_categories, token: str):
     data = {
       "title": "string",
       "describe": "string",
@@ -87,10 +90,10 @@ async def create_course(client: AsyncClient, create_categories):
       "difficulty": "easy",
       "categories": [1]
     }
-    await client.post("/courses/create", json=data)
+    await client.post("/courses/create", json=data, headers=get_auth_header(token))
 
 
 @pytest.fixture
-async def create_section(client: AsyncClient, create_course):
+async def create_section(client: AsyncClient, create_course, token: str):
     data = {"title": "Test section 1", "describe": "this section test 1", "course_id": 1, "subsections": []}
-    await client.post("/sections/create", json=data)
+    await client.post("/sections/create", json=data, headers=get_auth_header(token))

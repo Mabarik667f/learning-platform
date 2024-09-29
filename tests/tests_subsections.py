@@ -1,6 +1,9 @@
+import pytest
+
 from httpx import AsyncClient
 from loguru import logger
-import pytest
+
+from .helpers.auth_middleware import get_auth_header
 
 @pytest.mark.usefixtures("create_user", "create_section")
 class TestForSubsections:
@@ -11,14 +14,17 @@ class TestForSubsections:
     def get_endpoint(cls, url: str | int):
         return f"{cls.prefix}{url}"
 
-    async def test_create_subsection(self, client: AsyncClient):
+    """CRUD"""
+    async def test_create_subsection(self, client: AsyncClient, token: str):
         data = {"title": "Test title 1", "section_id": 1}
-        response = await client.post(self.get_endpoint("create"), json=data)
+        response = await client.post(
+            self.get_endpoint("create"), json=data, headers=get_auth_header(token))
         assert response.status_code == 201
         assert response.json().get("title") == "Test title 1"
 
         data["section_id"] = 100
-        response = await client.post(self.get_endpoint("create"), json=data)
+        response = await client.post(
+            self.get_endpoint("create"), json=data, headers=get_auth_header(token))
         assert response.status_code == 400
 
     async def test_get_subsection(self, client: AsyncClient):
@@ -31,10 +37,11 @@ class TestForSubsections:
         response = await client.get(self.get_endpoint(subsection_id))
         assert response.status_code == 400
 
-    async def test_patch_subsection(self, client: AsyncClient):
+    async def test_patch_subsection(self, client: AsyncClient, token: str):
         subsection_id = 1
         data = {"title": "New subsection title"}
-        response = await client.patch(self.get_endpoint(f"patch/{subsection_id}"), json=data)
+        response = await client.patch(
+            self.get_endpoint(f"patch/{subsection_id}"), json=data, headers=get_auth_header(token))
         assert response.status_code == 200
         assert response.json().get('title') == "New subsection title"
 
@@ -48,14 +55,17 @@ class TestForSubsections:
         response = await client.get(self.get_endpoint(f"list/{section_id}"))
         assert response.status_code == 400
 
-    async def test_delete_subsection(self, client: AsyncClient):
+    async def test_delete_subsection(self, client: AsyncClient, token: str):
         subsection_id = 1
-        response = await client.delete(self.get_endpoint(f"delete/{subsection_id}"))
+        response = await client.delete(
+            self.get_endpoint(f"delete/{subsection_id}"), headers=get_auth_header(token))
         assert response.status_code == 204
         response = await client.get(self.get_endpoint(subsection_id))
-        logger.info(f"SUBSECTION = {response.json()}")
         assert response.status_code == 400
 
         subsection_id = 100
-        response = await client.delete(self.get_endpoint(f"delete/{subsection_id}"))
+        response = await client.delete(
+            self.get_endpoint(f"delete/{subsection_id}"), headers=get_auth_header(token))
         assert response.status_code == 400
+
+    """END CRUD TESTS"""

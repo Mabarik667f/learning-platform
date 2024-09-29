@@ -128,6 +128,7 @@ async def patch_subsection(
     await session.refresh(subsection_obj)
     return subsection_obj
 
+
 async def get_subsection(
     session: AsyncSession,
     subsection_id: int
@@ -138,6 +139,7 @@ async def get_subsection(
         return res.scalar_one()
     except NoResultFound:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"id": "Подраздел не найден!"})
+
 
 async def get_list_subsection(
     session: AsyncSession,

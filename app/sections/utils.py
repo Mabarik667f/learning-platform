@@ -2,9 +2,11 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlalchemy import select
-from models.courses import Section as SectionModel
-from .shemas import CreateSection
+from tasks.shemas import CreateTask
+from models.courses import Section as SectionModel, Subsection as SubSectionModel
 from fastapi import status, HTTPException
+
+from .shemas import CreateSection, CreateSubSection
 
 """Sections"""
 async def get_selectin_section(
@@ -25,6 +27,7 @@ async def get_selectin_section(
 async def add_subsection_to_section(
     session: AsyncSession,
     section_id: int,
+    subsection_for_create: CreateSubSection
 ) -> SectionModel:
     pass
 
@@ -37,3 +40,16 @@ async def bulk_create_section(
 
 
 """SubSections"""
+async def get_selection_subsection(
+    subsection_id: int,
+    session: AsyncSession
+) -> SubSectionModel:
+    pass
+
+
+async def add_task_to_subsection(
+    session: AsyncSession,
+    section_id: int,
+    task_for_create: CreateTask
+) -> SubSectionModel:
+    pass
