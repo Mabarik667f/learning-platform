@@ -24,7 +24,7 @@ class SectionResponse(SectionBase):
         from_attributes = True
 
 class SectionWithSubsectionsResponse(SectionResponse):
-    subsections: list['SubSectionBase'] = Field(default=[])
+    subsections: list['SubSectionResponse'] = Field(default=[])
 
 
 class SubSectionBase(BaseModel):

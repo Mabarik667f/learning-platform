@@ -1,3 +1,4 @@
+from loguru import logger
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -6,6 +7,7 @@ from tasks.shemas import CreateTask
 from models.courses import Section as SectionModel, Subsection as SubSectionModel
 from fastapi import status, HTTPException
 
+from . import crud
 from .shemas import CreateSection, CreateSubSection
 
 """Sections"""
@@ -29,7 +31,14 @@ async def add_subsection_to_section(
     section_id: int,
     subsection_for_create: CreateSubSection
 ) -> SectionModel:
-    pass
+    section_obj = await get_selectin_section(session, section_id)
+    new_subsection = await crud.create_subsection(session, subsection_for_create)
+    section_obj.subsections.append(new_subsection)
+
+    await session.refresh(section_obj)
+    await session.commit()
+    return section_obj
+
 
 
 async def bulk_create_section(

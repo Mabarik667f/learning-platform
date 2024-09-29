@@ -2,11 +2,14 @@ from fastapi import APIRouter, status, Response
 
 from core.deps import SessionDep
 from users.deps import CurActiveUserDep
+
 from .shemas import (CreateSection, CreateSubSection,
     SectionResponse, SectionWithSubsectionsResponse,
     SubSectionBase, SubSectionResponse, SubSectionWithTasksResponse, UpdateSection, UpdateSubSection)
-from loguru import logger
+from .helpers import get_pydantic_subsections
 from . import crud, utils
+
+from loguru import logger
 
 router_section = APIRouter(prefix="/sections", tags=["sections"])
 router_subsection = APIRouter(prefix="/subsections", tags=["subsections"])
@@ -29,8 +32,7 @@ async def create_section(
     """
     created_section_obj = await crud.create_section(session, section)
     obj = await utils.get_selectin_section(session, created_section_obj.id)
-    subsections = [SubSectionBase(**sub.to_dict()) for sub in obj.subsections]
-
+    subsections = get_pydantic_subsections(obj)
     return SectionWithSubsectionsResponse(**obj.to_dict(), subsections=subsections)
 
 
@@ -61,7 +63,7 @@ async def get_section(
     session: SessionDep
 ):
     section_obj = await utils.get_selectin_section(session, section_id)
-    subsections = [SubSectionBase(**sub.to_dict()) for sub in section_obj.subsections]
+    subsections = get_pydantic_subsections(section_obj)
     return SectionWithSubsectionsResponse(**section_obj.to_dict(), subsections=subsections)
 
 
@@ -84,14 +86,16 @@ async def bulk_create_sections(
     pass
 
 
-@router_section.patch("/add-subsection/{section_id}", response_model=SectionResponse)
-async def add_subsections(
+@router_section.put("/add-subsection/{section_id}", response_model=SectionWithSubsectionsResponse)
+async def add_subsection(
     section_id: int,
-    subsection_id: int,
+    subsection_for_added: CreateSubSection,
     current_user: CurActiveUserDep,
     session: SessionDep
 ):
-    pass
+    obj = await utils.add_subsection_to_section(session, section_id, subsection_for_added)
+    subsections = get_pydantic_subsections(obj)
+    return SectionWithSubsectionsResponse(**obj.to_dict(), subsections=subsections)
 
 """Subsections"""
 
