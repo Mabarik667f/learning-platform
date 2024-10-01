@@ -7,7 +7,7 @@ from .shemas import (CreateSection, CreateSubSection,
     SectionResponse, SectionWithSubsectionsResponse,
     SubSectionResponse, SubSectionWithTasksResponse, UpdateSection, UpdateSubSection)
 from .helpers import get_pydantic_subsections
-from . import crud, utils
+from .crud import SectionCrud, SubSectionCrud
 
 from loguru import logger
 
@@ -30,8 +30,9 @@ async def create_section(
         example:\n
             {"title": "Test title", "describe": "Test describe"}\n
     """
-    created_section_obj = await crud.create_section(session, section)
-    obj = await utils.get_selectin_section(session, created_section_obj.id)
+    section_crud = SectionCrud(session)
+    created_section_obj = await section_crud.create_section(section)
+    obj = await section_crud.get_section(created_section_obj.id, load_selectin=True)
     subsections = get_pydantic_subsections(obj)
     return SectionWithSubsectionsResponse(**obj.to_dict(), subsections=subsections)
 
@@ -42,7 +43,7 @@ async def delete_section(
     session: SessionDep,
     current_user: CurActiveUserDep,
 ):
-    await crud.delete_section(session, section_id)
+    await SectionCrud(session).delete_section(section_id)
 
 
 @router_section.patch("/patch/{section_id}", response_model=SectionResponse)
@@ -53,7 +54,8 @@ async def patch_section(
     session: SessionDep,
 ):
     """Change only section data, not added subsections this method!"""
-    section_obj = await crud.patch_section(session, section_id, updated_section)
+    section_crud = SectionCrud(session)
+    section_obj = await section_crud.patch_section(section_id, updated_section)
     return SectionResponse(**section_obj.to_dict())
 
 
@@ -62,7 +64,7 @@ async def get_section(
     section_id: int,
     session: SessionDep
 ):
-    section_obj = await utils.get_selectin_section(session, section_id)
+    section_obj = await SectionCrud(session).get_section(section_id, load_selectin=True)
     subsections = get_pydantic_subsections(section_obj)
     return SectionWithSubsectionsResponse(**section_obj.to_dict(), subsections=subsections)
 
@@ -74,7 +76,8 @@ async def get_list_sections(
     course_id: int,
     session: SessionDep
 ):
-    section_objects = await crud.get_list_section(session, course_id)
+    section_crud = SectionCrud(session)
+    section_objects = await section_crud.get_list_section(course_id)
     return [SectionResponse(**s.to_dict()) for s in section_objects]
 
 
@@ -93,7 +96,8 @@ async def create_subsection(
     Params:
         tasks: any JSON objects
     """
-    subsection_obj = await crud.create_subsection(session, subsection)
+    subsection_crud = SubSectionCrud(session)
+    subsection_obj = await subsection_crud.create_subsection(subsection)
     return SubSectionWithTasksResponse(**subsection_obj.to_dict())
 
 
@@ -103,7 +107,7 @@ async def delete_subsection(
     current_user: CurActiveUserDep,
     subsection_id: int
 ):
-    await crud.delete_subsection(session, subsection_id)
+    await SubSectionCrud(session).delete_subsection(subsection_id)
 
 @router_subsection.patch("/patch/{subsection_id}", response_model=SubSectionResponse)
 async def patch_subsection(
@@ -113,7 +117,9 @@ async def patch_subsection(
     updated_subsection: UpdateSubSection
 ):
     """Only scalars attributes patch"""
-    obj = await crud.patch_subsection(session, subsection_id, updated_subsection)
+
+    subsection_crud = SubSectionCrud(session)
+    obj = await subsection_crud.patch_subsection(subsection_id, updated_subsection)
     return SubSectionResponse(**obj.to_dict())
 
 @router_subsection.get("/{subsection_id}", response_model=SubSectionWithTasksResponse)
@@ -122,16 +128,19 @@ async def get_subsection(
     session: SessionDep,
 ):
     # add tasks for response
-    obj = await crud.get_subsection(session, subsection_id)
+    subsection_crud = SubSectionCrud(session)
+    obj = await subsection_crud.get_subsection(subsection_id)
     return SubSectionWithTasksResponse(**obj.to_dict())
 
-"""END CRUD"""
 
-"""Other Endpoints"""
 @router_subsection.get('/list/{section_id}', response_model=list[SubSectionResponse])
 async def list_subsection(
     section_id: int,
     session: SessionDep,
 ):
-    objects = await crud.get_list_subsection(session, section_id)
+
+    subsection_crud = SubSectionCrud(session)
+    objects = await subsection_crud.get_list_subsection(section_id)
     return [SubSectionResponse(**s.to_dict()) for s in objects]
+
+"""END CRUD"""

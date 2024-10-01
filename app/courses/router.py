@@ -8,9 +8,9 @@ from users.deps import CurActiveUserDep
 from core.deps import SessionDep
 from .shemas import (AddCategoriesToCourse, CourseAllData, CourseDifficulty,
     CourseListQueryParams, CourseResponse, CourseWithCategories,
-    CreateCourse, UpdateCourse)
+    CreateCourse, CreateCourseStruct, UpdateCourse)
 from .deps import ListQueryParamsDp
-from .utils import add_categories_to_course, del_category, get_all_difficulties
+from .utils import add_categories_to_course, del_category, get_all_difficulties, struct_create
 from . import crud
 
 from loguru import logger
@@ -104,3 +104,14 @@ async def add_categories(
 
     categories = [Category(**category.to_dict()) for category in categories_row]
     return CourseWithCategories(**course.to_dict(), categories=categories)
+
+
+@router.post("/struct/{course_id}")
+async def create_course_struct(
+    session: SessionDep,
+    current_user: CurActiveUserDep,
+    course_id: int,
+    struct: CreateCourseStruct
+):
+    struct_obj = await struct_create(session, struct, course_id)
+    return CourseResponse(**struct_obj.to_dict())

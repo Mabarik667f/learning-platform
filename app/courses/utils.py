@@ -1,3 +1,4 @@
+import asyncio
 from fastapi import status
 from collections.abc import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -5,9 +6,14 @@ from sqlalchemy import select, Row, delete
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 
-from . import crud
 from models.courses import Course, Difficulty
 from models.categories import Category, CourseHasCategory
+from sections.shemas import CreateSection
+from sections.crud import SectionCrud
+
+from .shemas import CreateCourseStruct
+from . import crud
+
 from loguru import logger
 
 
@@ -54,6 +60,17 @@ async def get_all_difficulties(session: AsyncSession) -> list[Difficulty]:
     return [df for df in Difficulty]
 
 
-async def struct_create(session: AsyncSession, struct) -> Course:
+async def struct_create(session: AsyncSession, struct: CreateCourseStruct, course_id: int) -> Course:
     """Create sections and subsections"""
-    pass
+    course_obj = await crud.get_course(session, course_id)
+
+    tasks = [asyncio.create_task(SectionCrud(session).create_section(
+        CreateSection(**s.dict(), course_id=course_id))) for s in struct.sections]
+    for coro in asyncio.as_completed(tasks):
+        section = await coro
+        course_obj.sections.append(section)
+
+    await session.refresh(course_obj)
+    await session.commit()
+
+    return course_obj

@@ -17,7 +17,7 @@ class CreateSection(SectionBase):
     subsections: list['SubSectionBase'] = Field(default=[])
 
 class CreateSectionForCourseStruct(SectionBase):
-    subsections: list["SubSectionBase"] = Field(default=[])
+    subsections: list["SubSectionBase"]
 
 
 class SectionResponse(SectionBase):

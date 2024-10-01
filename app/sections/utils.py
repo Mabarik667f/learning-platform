@@ -7,32 +7,19 @@ from tasks.shemas import CreateTask
 from models.courses import Section as SectionModel, Subsection as SubSectionModel
 from fastapi import status, HTTPException
 
-from . import crud
+from .crud import SectionCrud, SubSectionCrud
 from .shemas import CreateSection, CreateSubSection
 
 """Sections"""
-async def get_selectin_section(
-    session: AsyncSession,
-    section_id: int
-) -> SectionModel:
-    q = (select(SectionModel)
-        .where(SectionModel.id == section_id)
-        .options(selectinload(SectionModel.subsections))
-    )
-    res = await session.execute(q)
-    try:
-        return res.scalar_one()
-    except NoResultFound:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"id": "Раздел не найден!"})
-
 
 async def add_subsection_to_section(
     session: AsyncSession,
     section_id: int,
     subsection_for_create: CreateSubSection
 ) -> SectionModel:
-    section_obj = await get_selectin_section(session, section_id)
-    new_subsection = await crud.create_subsection(session, subsection_for_create)
+
+    section_obj = await SectionCrud(session).get_section(section_id, load_selectin=True)
+    new_subsection = await SubSectionCrud(session).create_subsection(subsection_for_create)
     section_obj.subsections.append(new_subsection)
 
     await session.refresh(section_obj)
