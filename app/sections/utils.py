@@ -54,11 +54,3 @@ async def get_selection_subsection(
     session: AsyncSession
 ) -> SubSectionModel:
     pass
-
-
-async def add_task_to_subsection(
-    session: AsyncSession,
-    section_id: int,
-    task_for_create: CreateTask
-) -> SubSectionModel:
-    pass

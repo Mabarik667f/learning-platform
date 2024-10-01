@@ -50,6 +50,10 @@ async def del_category(session: AsyncSession, course_id: int, category_id: int) 
         detail={"course": "У курса должна быть хотя бы 1 категория"})
 
 
-
 async def get_all_difficulties(session: AsyncSession) -> list[Difficulty]:
     return [df for df in Difficulty]
+
+
+async def struct_create(session: AsyncSession, struct) -> Course:
+    """Create sections and subsections"""
+    pass

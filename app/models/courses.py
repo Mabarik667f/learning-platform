@@ -38,6 +38,7 @@ class Section(Base):
     title: Mapped[str] = mapped_column(String(50))
     describe: Mapped[str | None] = mapped_column(Text, nullable=True)
     course_id: Mapped[int] = mapped_column(ForeignKey("course.id", ondelete="CASCADE"))
+    position: Mapped[int] = mapped_column(CheckConstraint("position > 0"), nullable=False)
 
     course: Mapped["Course"] = relationship(back_populates="sections")
     subsections: Mapped[List["Subsection"]] = relationship(back_populates="section")
@@ -47,6 +48,7 @@ class Subsection(Base):
 
     id: Mapped[pk]
     title: Mapped[str] = mapped_column(String(50))
+    position: Mapped[int] = mapped_column(CheckConstraint("position > 0"), nullable=False)
     section_id: Mapped[int] = mapped_column(ForeignKey("section.id", ondelete="CASCADE"))
 
     section: Mapped["Section"] = relationship(back_populates="subsections")

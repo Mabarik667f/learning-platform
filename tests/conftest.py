@@ -95,5 +95,6 @@ async def create_course(client: AsyncClient, create_categories, token: str):
 
 @pytest.fixture
 async def create_section(client: AsyncClient, create_course, token: str):
-    data = {"title": "Test section 1", "describe": "this section test 1", "course_id": 1, "subsections": []}
+    data = {"title": "Test section 1", "describe": "this section test 1",
+        "course_id": 1, "subsections": [], "position": 1}
     await client.post("/sections/create", json=data, headers=get_auth_header(token))

@@ -1,17 +1,14 @@
 import pytest
 
+from .helpers.test_class import BaseTestClass
 from .helpers.auth_middleware import get_auth_header
 from httpx import AsyncClient
 from loguru import logger
 
 @pytest.mark.usefixtures("create_user", "create_course")
-class TestsForSections:
+class TestsForSections(BaseTestClass):
 
-    prefix = "/sections/"
-
-    @classmethod
-    def get_endpoint(cls, url: str | int):
-        return f"{cls.prefix}{url}"
+    prefix = "/sections"
 
     async def get_section(
         self,
@@ -27,7 +24,8 @@ class TestsForSections:
         headers = dict()
         headers.update(get_auth_header(token))
 
-        data = {"title": "Test section 1", "describe": "this section test 1", "course_id": 1, "subsections": []}
+        data = {"title": "Test section 1", "describe": "this section test 1", "course_id": 1, "subsections": [],
+            "position": 1}
         response = await client.post(
             self.get_endpoint("create"), json=data, headers=headers)
         assert response.status_code == 201
@@ -39,7 +37,8 @@ class TestsForSections:
 
         data = {"title": "Test section 2",
             "describe": "this section test 2", "course_id": 1,
-            "subsections": [{"title": "Test subsection 1"}]
+            "position": 2,
+            "subsections": [{"title": "Test subsection 1", "position": 1}]
         }
         response = await client.post(
             self.get_endpoint("create"), json=data, headers=headers)

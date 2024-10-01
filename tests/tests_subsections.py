@@ -3,16 +3,13 @@ import pytest
 from httpx import AsyncClient
 from loguru import logger
 
+from .helpers.test_class import BaseTestClass
 from .helpers.auth_middleware import get_auth_header
 
 @pytest.mark.usefixtures("create_user", "create_section")
-class TestForSubsections:
+class TestForSubsections(BaseTestClass):
 
-    prefix = "/subsections/"
-
-    @classmethod
-    def get_endpoint(cls, url: str | int):
-        return f"{cls.prefix}{url}"
+    prefix = "/subsections"
 
     """CRUD (delete in the end of tests)"""
     async def test_create_subsection(self, client: AsyncClient, token: str):
@@ -20,7 +17,7 @@ class TestForSubsections:
         headers = dict()
         headers.update(get_auth_header(token))
 
-        data = {"title": "Test title 1", "section_id": 1}
+        data = {"title": "Test title 1", "section_id": 1, "position": 1}
         response = await client.post(
             self.get_endpoint("create"), json=data, headers=headers)
         assert response.status_code == 201

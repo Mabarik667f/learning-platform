@@ -59,7 +59,7 @@ async def patch_section(
 ) -> SectionModel:
     section_obj = await get_section(session, section_id)
     for key, val in section.dict().items():
-        if section.dict().get(key, ""):
+        if section.dict().get(key, None):
             setattr(section_obj, key, val)
 
     await session.commit()
@@ -122,7 +122,8 @@ async def patch_subsection(
 ) -> SubSectionModel:
     subsection_obj = await get_subsection(session, subsection_id)
     for key, val in updated_subsection.dict().items():
-        setattr(subsection_obj, key, val)
+        if updated_subsection.dict()[key]:
+            setattr(subsection_obj, key, val)
 
     await session.commit()
     await session.refresh(subsection_obj)
