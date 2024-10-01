@@ -5,7 +5,7 @@ from users.deps import CurActiveUserDep
 
 from .shemas import (CreateSection, CreateSubSection,
     SectionResponse, SectionWithSubsectionsResponse,
-    SubSectionBase, SubSectionResponse, SubSectionWithTasksResponse, UpdateSection, UpdateSubSection)
+    SubSectionResponse, SubSectionWithTasksResponse, UpdateSection, UpdateSubSection)
 from .helpers import get_pydantic_subsections
 from . import crud, utils
 
@@ -67,6 +67,8 @@ async def get_section(
     return SectionWithSubsectionsResponse(**section_obj.to_dict(), subsections=subsections)
 
 
+"""Other endpoints"""
+
 @router_section.get("/list/{course_id}", response_model=list[SectionResponse])
 async def get_list_sections(
     course_id: int,
@@ -75,33 +77,12 @@ async def get_list_sections(
     section_objects = await crud.get_list_section(session, course_id)
     return [SectionResponse(**s.to_dict()) for s in section_objects]
 
-"""Other endpoints"""
-
-@router_section.post("/bulk-create", response_model=list[SectionResponse])
-async def bulk_create_sections(
-    sections: list[CreateSection],
-    current_user: CurActiveUserDep,
-    session: SessionDep,
-):
-    pass
-
-
-@router_section.put("/add-subsection/{section_id}", response_model=SectionWithSubsectionsResponse)
-async def add_subsection(
-    section_id: int,
-    subsection_for_added: CreateSubSection,
-    current_user: CurActiveUserDep,
-    session: SessionDep
-):
-    obj = await utils.add_subsection_to_section(session, section_id, subsection_for_added)
-    subsections = get_pydantic_subsections(obj)
-    return SectionWithSubsectionsResponse(**obj.to_dict(), subsections=subsections)
 
 """Subsections"""
 
 """CRUD"""
 
-@router_subsection.post("/create", response_model=SubSectionWithTasksResponse, status_code=status.HTTP_201_CREATED)
+@router_subsection.post("/create", response_model=SubSectionResponse, status_code=status.HTTP_201_CREATED)
 async def create_subsection(
     session: SessionDep,
     current_user: CurActiveUserDep,
@@ -112,7 +93,6 @@ async def create_subsection(
     Params:
         tasks: any JSON objects
     """
-    # add tasks ! - refactoring
     subsection_obj = await crud.create_subsection(session, subsection)
     return SubSectionWithTasksResponse(**subsection_obj.to_dict())
 
@@ -141,6 +121,7 @@ async def get_subsection(
     subsection_id: int,
     session: SessionDep,
 ):
+    # add tasks for response
     obj = await crud.get_subsection(session, subsection_id)
     return SubSectionWithTasksResponse(**obj.to_dict())
 

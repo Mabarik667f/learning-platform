@@ -10,7 +10,7 @@ class TestsForSections:
     prefix = "/sections/"
 
     @classmethod
-    def get_endpoint(cls, url: str | int): # rewrite to fixture
+    def get_endpoint(cls, url: str | int):
         return f"{cls.prefix}{url}"
 
     async def get_section(
@@ -79,29 +79,6 @@ class TestsForSections:
         assert response.status_code == 200
         assert len(response.json()) == 2
 
-    """End CRUD Tests (delete end) """
-
-    async def test_add_subsection_to_section(self, client: AsyncClient, token: str):
-        headers = dict()
-        headers.update(get_auth_header(token))
-
-        section_id = 1
-        added_subsection = {"title": "Added subsection 1"}
-        response = await client.put(self.get_endpoint(f"add-subsection/{section_id}"),
-           json=added_subsection, headers=headers)
-
-        assert response.status_code == 200
-        assert len(response.json().get('subsections')) == 1
-
-    # async def test_bulk_create_sections(self, client: AsyncClient):
-    #     # create course
-    #     data = {"title": "Test section 1", "describe": "this section test 1", "course_id": 0}
-    #     response = await client.get("/users/me")
-    #     assert response.status_code == 200
-
-
-    """DELETE"""
-
     async def test_delete_section(self, client: AsyncClient, token: str):
         headers = dict()
         headers.update(get_auth_header(token))
@@ -111,7 +88,6 @@ class TestsForSections:
             self.get_endpoint(f"delete/{section_id}"), headers=headers)
         assert response.status_code == 204
 
-
         section_id = 2
         response = await client.delete(
             self.get_endpoint(f"delete/{section_id}"), headers=headers)
@@ -120,3 +96,5 @@ class TestsForSections:
         response = await client.delete(
             self.get_endpoint(f"delete/{section_id}"), headers=headers)
         assert response.status_code == 400
+
+    """End CRUD Tests """

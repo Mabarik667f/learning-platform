@@ -57,8 +57,8 @@ class Task(Base):
     __tablename__ = "task"
 
     id: Mapped[pk]
-    text: Mapped[str | None] = mapped_column(Text, nullable=True)
-    video: Mapped[str] = mapped_column(String, nullable=False)
+    text: Mapped[str | None] = mapped_column(Text, nullable=False)
+    video_path: Mapped[str] = mapped_column(String, nullable=True)
 
     todo: Mapped[bool] = mapped_column(default=False)
     scores: Mapped[int] = mapped_column(CheckConstraint("scores > 0"), nullable=False)
@@ -99,7 +99,7 @@ class TaskType(Base):
     __tablename__ = "task_type"
 
     id: Mapped[pk]
-    name: Mapped[str]
+    name: Mapped[str] = mapped_column(unique=True)
 
     tasks: Mapped[list["Task"]] = relationship(back_populates="task_type")
 

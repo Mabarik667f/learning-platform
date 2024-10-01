@@ -1,11 +1,10 @@
 import asyncio
 from collections.abc import Sequence
 from typing import NoReturn
-from sqlalchemy import delete, select
+from sqlalchemy import select, delete
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from fastapi import HTTPException, status
-from sqlalchemy.orm import selectinload
 
 from models.courses import Section as SectionModel, Subsection as SubSectionModel
 from courses.crud import get_course
@@ -27,7 +26,6 @@ async def create_section(
 
     section_obj = SectionModel(**section_dict)
     if subsections:
-        logger.info(subsections)
         subs = await asyncio.gather(*
             [create_subsection(session, CreateSubSection(**sub)) for sub in subsections]
         )
@@ -44,6 +42,7 @@ async def delete_section(
     session: AsyncSession,
     section_id: int
 ) -> NoReturn:
+
     section_obj = await get_selectin_section(session, section_id)
     subssection_ids: list[int] = [s.id for s in section_obj.subsections]
     del_q = (delete(SubSectionModel)
@@ -52,7 +51,6 @@ async def delete_section(
     await session.execute(del_q)
     await session.delete(section_obj)
     await session.commit()
-
 
 async def patch_section(
     session: AsyncSession,
@@ -98,12 +96,8 @@ async def create_subsection(
     subsection: CreateSubSection
 ) -> SubSectionModel:
     await get_section(session, subsection.section_id)
-    subsection_dict = subsection.dict()
-    tasks = subsection_dict.pop('tasks')
-    if tasks:
-        pass
 
-    subsection_obj = SubSectionModel(**subsection_dict)
+    subsection_obj = SubSectionModel(**subsection.dict())
     session.add(subsection_obj)
 
     await session.commit()
@@ -115,6 +109,7 @@ async def delete_subsection(
     session: AsyncSession,
     subsection_id: int
 ) -> NoReturn:
+    # fix this - delete all tasks ?
     subsection_obj = await get_subsection(session, subsection_id)
     await session.delete(subsection_obj)
     await session.commit()

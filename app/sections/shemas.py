@@ -37,7 +37,6 @@ class UpdateSubSection(SubSectionBase):
 
 class CreateSubSection(SubSectionBase):
     section_id: int = 1
-    tasks: list['Task'] = Field(default=[])
 
 
 class SubSectionResponse(SubSectionBase):
