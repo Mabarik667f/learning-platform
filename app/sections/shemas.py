@@ -4,12 +4,12 @@ from tasks.shemas import Task
 class SectionBase(BaseModel):
     title: str
     describe: str
-    position: int
+    position: int = Field(gt=0)
 
 class UpdateSection(SectionBase):
     title: str = Field(default=None)
     describe: str = Field(default=None)
-    position: int = Field(default=None)
+    position: int = Field(default=None, gt=0)
 
 
 class CreateSection(SectionBase):
@@ -42,11 +42,11 @@ class UpdateSubSection(SubSectionBase):
     position: int = Field(default=None)
 
 class CreateSubSection(SubSectionBase):
-    section_id: int = 1
+    section_id: int = Field(gt=0)
 
 class SubSectionResponse(SubSectionBase):
     id: int
-    section_id: int = 1
+    section_id: int = Field(gt=0)
 
     class Config:
         from_attributes = True

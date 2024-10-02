@@ -8,7 +8,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.orm import selectinload
 from sqlalchemy.sql.selectable import Select
 from core.crud import BaseCrud
-from models.courses import Section as SectionModel, Subsection as SubSectionModel
+from core.deps import AsyncSessionMaker, AsyncSessionMakerDep
+from models.courses import Course, Section as SectionModel, Subsection as SubSectionModel
 from courses.crud import get_course
 from .shemas import CreateSection, CreateSubSection, UpdateSection, UpdateSubSection
 
@@ -37,6 +38,39 @@ class SectionCrud(BaseCrud):
         await self.session.commit()
         await self.session.refresh(section_obj)
         return section_obj
+
+    async def create_section_task(
+        self,
+        section: CreateSection,
+        sessionmaker: AsyncSessionMakerDep,
+    ) -> SectionModel:
+        async with sessionmaker() as session:
+            section_dict = section.dict()
+            subsections = section_dict.pop('subsections', [])
+            section_obj = SectionModel(**section_dict)
+            session.add(section_obj)
+            await session.commit()
+            await session.refresh(section_obj)
+            await session.merge(section_obj)
+            if subsections:
+                logger.info("START CREATE SUBS")
+                logger.info(subsections)
+                subs = await asyncio.gather(*
+                    [SubSectionCrud(session)
+                        .create_subsection_task(CreateSubSection(**sub, section_id=section_obj.id), sessionmaker) for sub in subsections]
+                )
+                logger.info("CREATE SUBS")
+                logger.info(subs)
+                section_obj.subsections.extend(subs)
+                logger.info(f"SUBS FOR SECTION : {section_obj.subsections}")
+                logger.info("END CREATE SUBS")
+
+            logger.info("OBJECT ADD")
+            await session.commit()
+            await session.refresh(section_obj)
+            logger.info("RETURN")
+            return section_obj
+
 
     async def delete_section(
         self,
@@ -109,16 +143,27 @@ class SubSectionCrud(BaseCrud):
         self,
         subsection: CreateSubSection
     ) -> SubSectionModel:
-
         section_crud = SectionCrud(self.session)
         await section_crud.get_section(subsection.section_id)
-
         subsection_obj = SubSectionModel(**subsection.dict())
         self.session.add(subsection_obj)
 
         await self.session.commit()
         await self.session.refresh(subsection_obj)
         return subsection_obj
+
+    async def create_subsection_task(
+        self,
+        subsection: CreateSubSection,
+        sessionmaker
+    ) -> SubSectionModel:
+        async with sessionmaker() as session:
+            subsection_obj = SubSectionModel(**subsection.dict())
+            session.add(subsection_obj)
+
+            await session.commit()
+            await session.refresh(subsection_obj)
+            return subsection_obj
 
 
     async def delete_subsection(

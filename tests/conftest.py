@@ -1,6 +1,7 @@
 import asyncio
 import pytest
 
+from typing import Any
 from collections.abc import AsyncGenerator
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio.engine import create_async_engine
@@ -36,7 +37,13 @@ async def connection() -> AsyncGenerator[AsyncSession, None]:
             await session.rollback()
             await session.close()
 
+
+
+async def get_async_session_maker_test() -> AsyncGenerator[async_sessionmaker[AsyncSession], Any]:
+    yield async_session_maker
+
 app.dependency_overrides[core.deps.get_db] = connection
+app.dependency_overrides[core.deps.get_async_session_maker] = get_async_session_maker_test
 
 @pytest.fixture(scope="module", autouse=True)
 async def setup():

@@ -60,17 +60,27 @@ async def get_all_difficulties(session: AsyncSession) -> list[Difficulty]:
     return [df for df in Difficulty]
 
 
-async def struct_create(session: AsyncSession, struct: CreateCourseStruct, course_id: int) -> Course:
+async def struct_create(sessionmaker, struct: CreateCourseStruct, course_id: int) -> Course:
     """Create sections and subsections"""
-    course_obj = await crud.get_course(session, course_id)
+    async with sessionmaker() as session:
+        logger.info("START")
+        course_obj = await crud.get_course(session, course_id)
 
-    tasks = [asyncio.create_task(SectionCrud(session).create_section(
-        CreateSection(**s.dict(), course_id=course_id))) for s in struct.sections]
-    for coro in asyncio.as_completed(tasks):
-        section = await coro
-        course_obj.sections.append(section)
+        logger.info("GET OBJECT")
+        tasks = [asyncio.create_task(SectionCrud(session).create_section_task(
+            CreateSection(**s.dict(), course_id=course_id), sessionmaker)) for s in struct.sections]
+        logger.info("CREATE TASKS")
+        for coro in asyncio.as_completed(tasks):
+            logger.info("CORO CYCLE")
+            section = await coro
+            logger.info("APPEND")
+            course_obj.sections.append(section)
 
-    await session.refresh(course_obj)
-    await session.commit()
-
-    return course_obj
+        logger.info("SAVE")
+        await session.refresh(course_obj)
+        await session.commit()
+        logger.info("RETURN")
+        logger.info(f"ALL DATA = COURSE:{course_obj}, SECTIONS:{course_obj.sections}")
+        for section in course_obj.sections:
+            logger.info(f"SUB FOR SECTION: {section.subsections}")
+        return course_obj

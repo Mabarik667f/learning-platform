@@ -5,7 +5,7 @@ from fastapi.routing import APIRouter
 from categories.utils import get_categories_by_ids
 from categories.shemas import Category
 from users.deps import CurActiveUserDep
-from core.deps import SessionDep
+from core.deps import AsyncSessionMaker, AsyncSessionMakerDep, SessionDep
 from .shemas import (AddCategoriesToCourse, CourseAllData, CourseDifficulty,
     CourseListQueryParams, CourseResponse, CourseWithCategories,
     CreateCourse, CreateCourseStruct, UpdateCourse)
@@ -106,12 +106,12 @@ async def add_categories(
     return CourseWithCategories(**course.to_dict(), categories=categories)
 
 
-@router.post("/struct/{course_id}")
+@router.post("/struct/{course_id}", status_code=status.HTTP_201_CREATED)
 async def create_course_struct(
-    session: SessionDep,
+    sessionmaker: AsyncSessionMakerDep,
     current_user: CurActiveUserDep,
     course_id: int,
     struct: CreateCourseStruct
 ):
-    struct_obj = await struct_create(session, struct, course_id)
+    struct_obj = await struct_create(sessionmaker, struct, course_id)
     return CourseResponse(**struct_obj.to_dict())

@@ -29,7 +29,7 @@ class Course(Base):
 
     categories: Mapped[List["CourseHasCategory"]] = relationship(back_populates="course")
     users: Mapped[List["Cart"]] = relationship(back_populates="course")
-    sections: Mapped[List["Section"]] = relationship(back_populates="course")
+    sections: Mapped[List["Section"]] = relationship(back_populates="course", lazy="selectin")
 
 class Section(Base):
     __tablename__ = "section"
@@ -41,7 +41,7 @@ class Section(Base):
     position: Mapped[int] = mapped_column(CheckConstraint("position > 0"), nullable=False)
 
     course: Mapped["Course"] = relationship(back_populates="sections")
-    subsections: Mapped[List["Subsection"]] = relationship(back_populates="section")
+    subsections: Mapped[List["Subsection"]] = relationship(back_populates="section", lazy="selectin")
 
 class Subsection(Base):
     __tablename__ = "subsection"
