@@ -6,10 +6,10 @@ from sqlalchemy import select, Row, delete
 from sqlalchemy.orm import selectinload
 from fastapi import HTTPException
 
-from models.courses import Course, Difficulty
+from models.courses import Course, Difficulty, Section as SectionModel, Subsection as SubSectionModel
 from models.categories import Category, CourseHasCategory
-from sections.shemas import CreateSection
-from sections.crud import SectionCrud
+from sections.shemas import CreateSection, CreateSubSection
+from sections.crud import SectionCrud, SubSectionCrud
 
 from .shemas import CreateCourseStruct
 from . import crud
@@ -67,7 +67,7 @@ async def struct_create(sessionmaker, struct: CreateCourseStruct, course_id: int
         course_obj = await crud.get_course(session, course_id)
 
         logger.info("GET OBJECT")
-        tasks = [asyncio.create_task(SectionCrud(session).create_section_task(
+        tasks = [asyncio.create_task(create_section_task(
             CreateSection(**s.dict(), course_id=course_id), sessionmaker)) for s in struct.sections]
         logger.info("CREATE TASKS")
         for coro in asyncio.as_completed(tasks):
@@ -84,3 +84,42 @@ async def struct_create(sessionmaker, struct: CreateCourseStruct, course_id: int
         for section in course_obj.sections:
             logger.info(f"SUB FOR SECTION: {section.subsections}")
         return course_obj
+
+
+async def create_section_task(
+    section: CreateSection,
+    sessionmaker,
+) -> SectionModel:
+    async with sessionmaker() as session:
+        section_dict = section.dict()
+        subsections = section_dict.pop('subsections', [])
+        section_obj = SectionModel(**section_dict)
+        session.add(section_obj)
+        await session.commit()
+        await session.refresh(section_obj)
+        await session.merge(section_obj)
+        if subsections:
+            logger.info("START CREATE SUBS")
+            logger.info(subsections)
+            subs = await asyncio.gather(*
+                [create_subsection_task(CreateSubSection(**sub, section_id=section_obj.id), sessionmaker) for sub in subsections]
+            )
+            logger.info("CREATE SUBS")
+            logger.info(subs)
+            section_obj.subsections.extend(subs)
+            logger.info(f"SUBS FOR SECTION : {section_obj.subsections}")
+            logger.info("END CREATE SUBS")
+
+        logger.info("OBJECT ADD")
+        await session.commit()
+        await session.refresh(section_obj)
+        logger.info("RETURN")
+        return section_obj
+
+
+async def create_subsection_task(
+    subsection: CreateSubSection,
+    sessionmaker
+) -> SubSectionModel:
+    async with sessionmaker() as session:
+        return await SubSectionCrud(session).create_subsection(subsection)
