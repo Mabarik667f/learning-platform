@@ -33,9 +33,8 @@ async def create_section(
             {"title": "Test title", "describe": "Test describe"}\n
     """
     created_section_obj = await section_crud.create_section(section)
-    obj = await section_crud.get_section(created_section_obj.id, load_selectin=True)
-    subsections = get_pydantic_subsections(obj)
-    return SectionWithSubsectionsResponse(**obj.to_dict(), subsections=subsections)
+    obj = await section_crud.add_subsections_for_section(created_section_obj, section.dict().pop("subsections", []))
+    return SectionWithSubsectionsResponse(**obj.to_dict(), subsections=get_pydantic_subsections(obj))
 
 
 @router_section.delete("/delete/{section_id}", status_code=status.HTTP_204_NO_CONTENT)

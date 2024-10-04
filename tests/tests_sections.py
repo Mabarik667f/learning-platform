@@ -42,6 +42,7 @@ class TestsForSections(BaseTestClass):
         }
         response = await client.post(
             self.get_endpoint("create"), json=data, headers=headers)
+
         assert response.status_code == 201
         assert response.json()["subsections"][0]['title'] == "Test subsection 1"
 
@@ -63,8 +64,9 @@ class TestsForSections(BaseTestClass):
         assert response.json()["describe"] == "New test describe"
 
     async def test_get_section(self, client: AsyncClient):
-        section_id = 2
+        section_id = 3
         response = await client.get(self.get_endpoint(section_id))
+        logger.info(response.json())
         assert response.status_code == 200
         assert response.json().get("subsections")[0]['title'] == "Test subsection 1"
 
@@ -87,7 +89,7 @@ class TestsForSections(BaseTestClass):
             self.get_endpoint(f"delete/{section_id}"), headers=headers)
         assert response.status_code == 204
 
-        section_id = 2
+        section_id = 3
         response = await client.delete(
             self.get_endpoint(f"delete/{section_id}"), headers=headers)
         assert response.status_code == 204

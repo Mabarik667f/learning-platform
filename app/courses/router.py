@@ -5,13 +5,13 @@ from fastapi.routing import APIRouter
 from categories.utils import get_categories_by_ids
 from categories.shemas import Category
 from users.deps import CurActiveUserDep
-from core.deps import AsyncSessionMaker, AsyncSessionMakerDep, SessionDep
+from core.deps import AsyncSessionMakerDep, SessionDep
 from .shemas import (AddCategoriesToCourse, CourseAllData, CourseDifficulty,
     CourseListQueryParams, CourseResponse, CourseWithCategories,
     CreateCourse, CreateCourseStruct, UpdateCourse)
-from .deps import ListQueryParamsDp
-from .utils import add_categories_to_course, del_category, get_all_difficulties, struct_create
-from . import crud
+from .deps import ListQueryParamsDp, CourseCrudDep
+from .utils import add_categories_to_course, del_category, get_all_difficulties
+from .services import CourseStruct
 
 from loguru import logger
 
@@ -20,44 +20,43 @@ router = APIRouter(tags=['courses'], prefix='/courses')
 
 @router.post('/create', status_code=status.HTTP_201_CREATED)
 async def create(
-    session: SessionDep,
+    course_crud: CourseCrudDep,
     current_user: CurActiveUserDep,
     course: CreateCourse
 ) -> CourseResponse:
-    course_obj = await crud.create_course(session, course)
+    course_obj = await course_crud.create_course(course)
     return CourseResponse(**course_obj.to_dict())
 
 
 @router.patch("/patch-data")
 async def patch(
-    session: SessionDep,
+    course_crud: CourseCrudDep,
     current_user: CurActiveUserDep,
     course_id: int,
     course: UpdateCourse
 ) -> CourseResponse:
-    course_obj = await crud.patch_course(session, course, course_id)
+    course_obj = await course_crud.patch_course(course, course_id)
     return CourseResponse(**course_obj.to_dict())
 
 
-@router.delete('/delete')
+@router.delete('/delete', status_code=status.HTTP_204_NO_CONTENT)
 async def delete(
-    session: SessionDep,
+    course_crud: CourseCrudDep,
     current_user: CurActiveUserDep,
     course_id: int
-) -> Response:
-    await crud.delete_course(session, course_id)
-    return Response(status_code=status.HTTP_204_NO_CONTENT)
+):
+    await course_crud.delete_course(course_id)
 
 
 @router.get("/list")
 async def get_list(
-    session: SessionDep,
+    course_crud: CourseCrudDep,
     *,
-    params: CourseListQueryParams = ListQueryParamsDp,
+    params: ListQueryParamsDp,
     limit: int = Query(10),
     offset: int = Query(0)
 ) -> list[CourseResponse]:
-    courses = await crud.get_list_course(session, params, limit, offset)
+    courses = await course_crud.get_list_course(params, limit, offset)
     return [CourseResponse(**course.to_dict()) for course in courses]
 
 
@@ -71,10 +70,10 @@ async def get_difficulties(
 
 @router.get('/{course_id}')
 async def get(
-    session: SessionDep,
+    course_crud: CourseCrudDep,
     course_id: int
 ) -> CourseResponse:
-    course = await crud.get_course(session, course_id)
+    course = await course_crud.get_course(course_id)
     return CourseResponse(**course.to_dict())
 
 
@@ -113,5 +112,5 @@ async def create_course_struct(
     course_id: int,
     struct: CreateCourseStruct
 ):
-    struct_obj = await struct_create(sessionmaker, struct, course_id)
+    struct_obj = await CourseStruct(sessionmaker).get_course_struct(struct, course_id)
     return CourseResponse(**struct_obj.to_dict())

@@ -9,9 +9,6 @@ from .utils import get_courses_with_single_or_few_categories
 from models.categories import Category as CategoryModel, CourseHasCategory
 from .shemas import CreateCategory, UpdateCategory
 
-"""
-Есть дублирование кода, можно сделать рефакторинг и сделать методы-ресиверы
-"""
 
 async def create_category(session: AsyncSession, category: CreateCategory) -> CategoryModel:
 
@@ -93,5 +90,4 @@ async def get_list_categories(
 ) -> Sequence[CategoryModel]:
     res = await session.execute(select(CategoryModel))
     res = res.scalars().all()
-    logger.info(res)
     return res

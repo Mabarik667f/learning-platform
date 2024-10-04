@@ -38,7 +38,6 @@ async def connection() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-
 async def get_async_session_maker_test() -> AsyncGenerator[async_sessionmaker[AsyncSession], Any]:
     yield async_session_maker
 

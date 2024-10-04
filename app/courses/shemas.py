@@ -3,7 +3,7 @@ from pydantic.main import BaseModel
 from pydantic.types import PositiveInt
 
 from categories.shemas import Category
-from sections.shemas import CreateSectionForCourseStruct, SectionBase
+from sections.shemas import CreateSectionForCourseStruct, SectionBase, SectionWithSubsectionsResponse
 from models.courses import Difficulty
 
 class CourseBase(BaseModel):
@@ -36,9 +36,10 @@ class CourseResponse(CourseBase):
     class Config:
         from_attributes = True
 
+
 class CourseAllData(CourseResponse):
     categories: list[Category]
-    sections: list[SectionBase] | None = None
+    sections: list["SectionWithSubsectionsResponse"] | None = None
 
 
 class CourseListQueryParams(BaseModel):

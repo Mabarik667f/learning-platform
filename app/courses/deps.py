@@ -1,5 +1,8 @@
+from typing import Annotated
 from fastapi import Depends, Query
+from core.deps import SessionDep
 from models.courses import Difficulty
+from .crud import CourseCrud
 from .shemas import CourseListQueryParams
 
 
@@ -16,4 +19,10 @@ async def get_list_query_params(
         categories=categories
     )
 
-ListQueryParamsDp = Depends(get_list_query_params)
+async def get_course_crud(
+    session: SessionDep
+) -> CourseCrud:
+    return CourseCrud(session)
+
+ListQueryParamsDp = Annotated[CourseListQueryParams, Depends(get_list_query_params)]
+CourseCrudDep = Annotated[CourseCrud, Depends(get_course_crud)]
