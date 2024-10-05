@@ -1,13 +1,17 @@
 import asyncio
 
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.session import async_sessionmaker
+from sqlalchemy.orm import joinedload
 
+from app.categories.shemas import CategoryResponse
 from models.courses import Course, Section as SectionModel, Subsection as SubSectionModel
-from sections.shemas import CreateSection, CreateSubSection
+from sections.shemas import CreateSection, CreateSubSection, SectionWithSubsectionsResponse, SubSectionResponse
 from sections.crud import SectionCrud, SubSectionCrud
 
-from .shemas import CreateCourseStruct
+from categories.utils import get_categories_by_ids
+from .shemas import CreateCourseStruct, CourseAllData, Category
 from .crud import CourseCrud
 
 from loguru import logger
@@ -19,7 +23,12 @@ class CourseStruct:
     async def __struct_create(self, struct: CreateCourseStruct, course_id: int) -> Course:
         """Create sections and subsections"""
         async with self.sessionmaker() as session:
-            course_obj = await CourseCrud(session).get_course(course_id)
+            res = await session.execute(
+                select(Course)
+                .options(joinedload(Course.categories))
+                .where(Course.id == course_id)
+            )
+            course_obj = res.unique().scalar_one()
 
             tasks = [asyncio.create_task(self.__create_section_task(
                 CreateSection(**s.dict(), course_id=course_id))) for s in struct.sections]
@@ -59,6 +68,15 @@ class CourseStruct:
         async with self.sessionmaker() as session:
             return await SubSectionCrud(session).create_subsection(subsection)
 
-    # this method must be return CourseAllData object - valid Pydantic model
-    async def get_course_struct(self, struct: CreateCourseStruct, course_id: int) -> Course:
-        return await self.__struct_create(struct, course_id)
+    async def get_course_struct(self, struct: CreateCourseStruct, course_id: int) -> CourseAllData:
+        obj = await self.__struct_create(struct, course_id)
+        async with self.sessionmaker() as session:
+            categories = await get_categories_by_ids(session, obj.categories)
+
+        cats = [CategoryResponse(**cat.to_dict()) for cat in categories]
+        sections = []
+        for section in obj.sections:
+            subs = [SubSectionResponse(**sub.to_dict()) for sub in section.subsections]
+            sections.append(SectionWithSubsectionsResponse(**section.to_dict(), subsections=subs))
+
+        return CourseAllData(**obj.to_dict(), categories=cats, sections=sections)

@@ -105,12 +105,12 @@ async def add_categories(
     return CourseWithCategories(**course.to_dict(), categories=categories)
 
 
-@router.post("/struct/{course_id}", status_code=status.HTTP_201_CREATED)
+@router.post("/struct/{course_id}", status_code=status.HTTP_201_CREATED, response_model=CourseAllData)
 async def create_course_struct(
+    session: SessionDep,
     sessionmaker: AsyncSessionMakerDep,
     current_user: CurActiveUserDep,
     course_id: int,
     struct: CreateCourseStruct
 ):
-    struct_obj = await CourseStruct(sessionmaker).get_course_struct(struct, course_id)
-    return CourseResponse(**struct_obj.to_dict())
+    return await CourseStruct(sessionmaker).get_course_struct(struct, course_id)

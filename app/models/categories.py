@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from core.db import Base, pk
 
 if TYPE_CHECKING:
-    from courses.models import *
+    from models.courses import *
 
 class Category(Base):
     __tablename__ = "category"

@@ -41,5 +41,9 @@ class TestsForCourseApi(BaseTestClass):
         response = await client.post(self.get_endpoint(
             f"struct/{course_id}"), json=data, headers=headers)
 
+        struct = response.json()
         assert response.status_code == 201
+        assert len(struct['categories']) == 1
+        assert len(struct['sections']) == 2
+        assert len(struct['sections'][0]['subsections']) == 2
         logger.info(f"result = {response.json()}")
