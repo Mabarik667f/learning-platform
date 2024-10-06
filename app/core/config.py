@@ -8,10 +8,9 @@ from loguru import logger
 
 load_dotenv()
 
+
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        case_sensitive=True
-    )
+    model_config = SettingsConfigDict(case_sensitive=True)
     SECRET_KEY: str
     ALLOWED_HOSTS: List[str]
     BACKEND_CORS: List[str]
@@ -19,18 +18,16 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
-    SMTP_HOST: str = 'localhost'
+    SMTP_HOST: str = "localhost"
     SMTP_PORT: int = 8025
     SMTP_FROM_ADDRESS: str = "default@mai.com"
     SMTP_FROM_PASSWORD: Optional[str | None] = None
-
 
     SQL_PASSWORD: str
     SQL_USER: str
     SQL_DB: str
     SQL_HOST: str
     SQL_PORT: int = 5432
-
 
     TEST_SQL_PASSWORD: str
     TEST_SQL_USER: str
@@ -52,8 +49,9 @@ class Settings(BaseSettings):
 
     @property
     def REDIS_URI(self):
-        return redis.Redis(host=self.REDIS_HOST, port=self.REDIS_PORT, decode_responses=True)
-
+        return redis.Redis(
+            host=self.REDIS_HOST, port=self.REDIS_PORT, decode_responses=True
+        )
 
     REDIS_PORT: int = 6379
     REDIS_HOST: str = "localhost"
@@ -68,4 +66,5 @@ class Settings(BaseSettings):
     SUPERUSER_PASSWORD: str
     REQUESTS_LOGGIN_MIDDLEWARE: bool = False
 
-settings = Settings() # type: ignore
+
+settings = Settings()  # type: ignore

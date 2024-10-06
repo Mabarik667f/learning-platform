@@ -14,13 +14,22 @@ from loguru import logger
 logger.remove()
 
 # requests logger
-logger.add(sys.stdout, colorize=True, format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>",
-    level="DEBUG")
+logger.add(
+    sys.stdout,
+    colorize=True,
+    format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>",
+    level="DEBUG",
+)
 
 # add loggers:
-logger.add("logging/debugger.log", colorize=True, rotation="10 KB", level="INFO",
+logger.add(
+    "logging/debugger.log",
+    colorize=True,
+    rotation="10 KB",
+    level="INFO",
     format="{time:HH:mm:ss} | {level} | {message}",
-    compression="zip")
+    compression="zip",
+)
 
 
 app = FastAPI()
@@ -30,13 +39,12 @@ app.include_router(api_router)
 if settings.BACKEND_CORS:
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            origin for origin in settings.BACKEND_CORS
-        ],
+        allow_origins=[origin for origin in settings.BACKEND_CORS],
         allow_credentials=True,
         allow_methods=["*"],
-        allow_headers=["*"]
+        allow_headers=["*"],
     )
+
 
 @app.middleware("http")
 async def log_middleware(request: Request, call_next):
@@ -56,9 +64,9 @@ async def log_middleware(request: Request, call_next):
     response = await call_next(request)
     return response
 
+
 @app.exception_handler(CoreValidationError)
 def core_validation_exc_handler(request, exc: CoreValidationError):
     return JSONResponse(
-        status_code=status.HTTP_400_BAD_REQUEST,
-        content={"detail": exc.to_dict()}
+        status_code=status.HTTP_400_BAD_REQUEST, content={"detail": exc.to_dict()}
     )

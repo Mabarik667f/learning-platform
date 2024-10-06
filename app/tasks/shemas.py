@@ -29,7 +29,7 @@ class TaskResponse(Task):
     subsection_id: int
     task_type: "TaskType"
     answers: list["Answer"] = Field(default=[])
-    task_tests: list['TaskTest'] = Field(default=[])
+    task_tests: list["TaskTest"] = Field(default=[])
 
     class Config:
         from_attributes = True

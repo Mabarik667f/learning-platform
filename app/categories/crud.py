@@ -10,7 +10,9 @@ from models.categories import Category as CategoryModel, CourseHasCategory
 from .shemas import CreateCategory, UpdateCategory
 
 
-async def create_category(session: AsyncSession, category: CreateCategory) -> CategoryModel:
+async def create_category(
+    session: AsyncSession, category: CreateCategory
+) -> CategoryModel:
 
     category_obj = CategoryModel(
         title=category.title,
@@ -20,7 +22,9 @@ async def create_category(session: AsyncSession, category: CreateCategory) -> Ca
         await session.commit()
         await session.refresh(category_obj)
     except IntegrityError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Категория уже сущесвует")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Категория уже сущесвует"
+        )
 
     return category_obj
 
@@ -41,39 +45,40 @@ async def update_category(
         await session.commit()
         await session.refresh(category_obj)
     except IntegrityError:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Категория уже сущесвует")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Категория уже сущесвует"
+        )
 
     return category_obj
 
 
-async def delete_category(
-    session: AsyncSession,
-    category_id: int) -> None:
+async def delete_category(session: AsyncSession, category_id: int) -> None:
 
-    category_obj = await get_category(session,category_id)
+    category_obj = await get_category(session, category_id)
 
     async with session.begin_nested():
 
-        empty_courses_ids = await get_courses_with_single_or_few_categories(session, category_id)
+        empty_courses_ids = await get_courses_with_single_or_few_categories(
+            session, category_id
+        )
 
         if empty_courses_ids:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="У одного или нескольких курсов это единственная категория!"
+                detail="У одного или нескольких курсов это единственная категория!",
             )
 
-        await session.execute(delete(CourseHasCategory)
-            .where(CourseHasCategory.category_id == category_id)
+        await session.execute(
+            delete(CourseHasCategory).where(
+                CourseHasCategory.category_id == category_id
+            )
         )
 
         await session.delete(category_obj)
         await session.commit()
 
 
-async def get_category(
-    session: AsyncSession,
-    category_id: int
-) -> CategoryModel:
+async def get_category(session: AsyncSession, category_id: int) -> CategoryModel:
 
     q = select(CategoryModel).where(CategoryModel.id == category_id)
     detail = {"id": "Объект не найден"}
@@ -85,9 +90,7 @@ async def get_category(
     return res
 
 
-async def get_list_categories(
-    session: AsyncSession
-) -> Sequence[CategoryModel]:
+async def get_list_categories(session: AsyncSession) -> Sequence[CategoryModel]:
     res = await session.execute(select(CategoryModel))
     res = res.scalars().all()
     return res

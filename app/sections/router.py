@@ -4,9 +4,16 @@ from fastapi import APIRouter, Depends, status, Response
 from core.deps import SessionDep
 from users.deps import CurActiveUserDep
 
-from .shemas import (CreateSection, CreateSubSection,
-    SectionResponse, SectionWithSubsectionsResponse,
-    SubSectionResponse, SubSectionWithTasksResponse, UpdateSection, UpdateSubSection)
+from .shemas import (
+    CreateSection,
+    CreateSubSection,
+    SectionResponse,
+    SectionWithSubsectionsResponse,
+    SubSectionResponse,
+    SubSectionWithTasksResponse,
+    UpdateSection,
+    UpdateSubSection,
+)
 from .helpers import get_pydantic_subsections
 from .crud import SectionCrud, SubSectionCrud
 from .deps import SectionCrudDep, SubSectionCrudDep
@@ -19,7 +26,13 @@ router_subsection = APIRouter(prefix="/subsections", tags=["subsections"])
 """Sections"""
 
 """CRUD"""
-@router_section.post("/create", response_model=SectionWithSubsectionsResponse, status_code=status.HTTP_201_CREATED)
+
+
+@router_section.post(
+    "/create",
+    response_model=SectionWithSubsectionsResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def create_section(
     section: CreateSection,
     current_user: CurActiveUserDep,
@@ -33,8 +46,12 @@ async def create_section(
             {"title": "Test title", "describe": "Test describe"}\n
     """
     created_section_obj = await section_crud.create_section(section)
-    obj = await section_crud.add_subsections_for_section(created_section_obj, section.dict().pop("subsections", []))
-    return SectionWithSubsectionsResponse(**obj.to_dict(), subsections=get_pydantic_subsections(obj))
+    obj = await section_crud.add_subsections_for_section(
+        created_section_obj, section.dict().pop("subsections", [])
+    )
+    return SectionWithSubsectionsResponse(
+        **obj.to_dict(), subsections=get_pydantic_subsections(obj)
+    )
 
 
 @router_section.delete("/delete/{section_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -65,10 +82,13 @@ async def get_section(
 ):
     section_obj = await section_crud.get_section(section_id, load_selectin=True)
     subsections = get_pydantic_subsections(section_obj)
-    return SectionWithSubsectionsResponse(**section_obj.to_dict(), subsections=subsections)
+    return SectionWithSubsectionsResponse(
+        **section_obj.to_dict(), subsections=subsections
+    )
 
 
 """Other endpoints"""
+
 
 @router_section.get("/list/{course_id}", response_model=list[SectionResponse])
 async def get_list_sections(
@@ -83,11 +103,14 @@ async def get_list_sections(
 
 """CRUD"""
 
-@router_subsection.post("/create", response_model=SubSectionResponse, status_code=status.HTTP_201_CREATED)
+
+@router_subsection.post(
+    "/create", response_model=SubSectionResponse, status_code=status.HTTP_201_CREATED
+)
 async def create_subsection(
     current_user: CurActiveUserDep,
     subsection: CreateSubSection,
-    subsection_crud: SubSectionCrudDep
+    subsection_crud: SubSectionCrudDep,
 ):
     """
     Base: create subsection object \n
@@ -98,25 +121,29 @@ async def create_subsection(
     return SubSectionWithTasksResponse(**subsection_obj.to_dict())
 
 
-@router_subsection.delete("/delete/{subsection_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router_subsection.delete(
+    "/delete/{subsection_id}", status_code=status.HTTP_204_NO_CONTENT
+)
 async def delete_subsection(
     current_user: CurActiveUserDep,
     subsection_id: int,
-    subsection_crud: SubSectionCrudDep
+    subsection_crud: SubSectionCrudDep,
 ):
     await subsection_crud.delete_subsection(subsection_id)
+
 
 @router_subsection.patch("/patch/{subsection_id}", response_model=SubSectionResponse)
 async def patch_subsection(
     subsection_crud: SubSectionCrudDep,
     current_user: CurActiveUserDep,
     subsection_id: int,
-    updated_subsection: UpdateSubSection
+    updated_subsection: UpdateSubSection,
 ):
     """Only scalars attributes patch"""
 
     obj = await subsection_crud.patch_subsection(subsection_id, updated_subsection)
     return SubSectionResponse(**obj.to_dict())
+
 
 @router_subsection.get("/{subsection_id}", response_model=SubSectionWithTasksResponse)
 async def get_subsection(
@@ -128,12 +155,13 @@ async def get_subsection(
     return SubSectionWithTasksResponse(**obj.to_dict())
 
 
-@router_subsection.get('/list/{section_id}', response_model=list[SubSectionResponse])
+@router_subsection.get("/list/{section_id}", response_model=list[SubSectionResponse])
 async def list_subsection(
     section_id: int,
     subsection_crud: SubSectionCrudDep,
 ):
     objects = await subsection_crud.get_list_subsection(section_id)
     return [SubSectionResponse(**s.to_dict()) for s in objects]
+
 
 """END CRUD"""

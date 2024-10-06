@@ -31,14 +31,17 @@ async def create_auth_tokens(data: dict) -> tuple[str, str]:
     refresh_data.update(data)
 
     access = await create_jwt_token(data=data, expires_delta=access_token_expire)
-    refresh = await create_jwt_token(data=refresh_data, expires_delta=refresh_token_expire)
+    refresh = await create_jwt_token(
+        data=refresh_data, expires_delta=refresh_token_expire
+    )
 
     return access, refresh
+
 
 async def get_current_user(
     session: SessionDep,
     security_scopes: SecurityScopes = SecurityScopes(),
-    token: str = OAuth2Dep
+    token: str = OAuth2Dep,
 ) -> UserResponse | HTTPException | None:
 
     if security_scopes.scopes:
@@ -52,8 +55,10 @@ async def get_current_user(
     )
 
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
-        username: str = payload.get('sub')
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+        username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
 
@@ -73,21 +78,26 @@ async def get_current_user(
             )
 
     if isinstance(user, User):
-        return UserResponse(
-            **user.to_dict()
-        )
+        return UserResponse(**user.to_dict())
+
 
 async def get_current_active_user(
     current_user: Annotated[UserResponse, Security(get_current_user, scopes=["me"])]
 ) -> UserResponse:
     if not current_user.is_active:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user"
+        )
     return current_user
 
 
 async def refresh_all_tokens(refresh_token: TokenRefresh) -> tuple[str, str]:
     """Можно сделать blacklist для refresh"""
-    payload = jwt.decode(refresh_token.refresh_token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+    payload = jwt.decode(
+        refresh_token.refresh_token,
+        settings.SECRET_KEY,
+        algorithms=[settings.ALGORITHM],
+    )
     username: str = payload.get("sub")
 
     if username is None or payload.get("type") != "refresh":

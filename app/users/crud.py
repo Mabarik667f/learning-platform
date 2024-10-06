@@ -9,11 +9,15 @@ from users.shemas import UserAllData, UserCreate, UserUpdate
 from users.utils import user_in_db, get_user_by_id
 from auth.utils import get_password_hash
 
+
 async def create_user(session: AsyncSession, user: UserCreate) -> User:
     user_exists = await user_in_db(session=session, user=user)
 
     if user_exists:
-        raise HTTPException(detail={"email": "Пользователь с такой почтой или логином существует!"}, status_code=status.HTTP_400_BAD_REQUEST)
+        raise HTTPException(
+            detail={"email": "Пользователь с такой почтой или логином существует!"},
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
 
     async with session.begin_nested():
 
@@ -25,7 +29,7 @@ async def create_user(session: AsyncSession, user: UserCreate) -> User:
             is_superuser=user.is_superuser,
             is_verified=user.is_verified,
             is_active=user.is_active,
-            role=user.role.value
+            role=user.role.value,
         )
 
         session.add(user_obj)
@@ -39,7 +43,10 @@ async def create_user(session: AsyncSession, user: UserCreate) -> User:
 
     return user_obj
 
-async def update_user_data(session: AsyncSession, user_id: int, update_data: UserUpdate):
+
+async def update_user_data(
+    session: AsyncSession, user_id: int, update_data: UserUpdate
+):
 
     user = await get_user_by_id(session, user_id)
     update_dict = update_data.dict(exclude_unset=True)
@@ -59,8 +66,11 @@ async def delete_user(session: AsyncSession, user_id: int) -> None:
     user_data = user_obj.to_dict()
     user = UserAllData(**user_data)
 
-    if user.is_superuser or user.role == 'owner':
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User is owner or superuser!")
+    if user.is_superuser or user.role == "owner":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="User is owner or superuser!",
+        )
 
     await session.delete(user_obj)
     await session.commit()

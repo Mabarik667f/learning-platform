@@ -19,24 +19,25 @@ from core.config import settings
 
 from loguru import logger
 
-router = APIRouter(
-    prefix='/auth',
-    tags=['auth']
-)
+router = APIRouter(prefix="/auth", tags=["auth"])
+
 
 @router.patch("/code")
-async def check_mail_code(session: SessionDep, code: VerifyCode, current_user: CurActiveUserDep):
+async def check_mail_code(
+    session: SessionDep, code: VerifyCode, current_user: CurActiveUserDep
+):
     true_code = MailingCodeUtils(current_user.username).check_code(code.code)
     if true_code:
-       return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     return Response(status_code=status.HTTP_400_BAD_REQUEST)
 
 
-@router.post('/token')
+@router.post("/token")
 async def login(
     session: SessionDep,
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
-    background_tasks: BackgroundTasks) -> Tokens:
+    background_tasks: BackgroundTasks,
+) -> Tokens:
 
     user = await auth_user(session, form_data.username, form_data.password)
 
@@ -45,14 +46,20 @@ async def login(
     )
 
     activation_code = await generate_activation_code(user.username)
-    background_tasks.add_task(send_mailing, user.email, msg=f"your activate code: {activation_code}")
+    background_tasks.add_task(
+        send_mailing, user.email, msg=f"your activate code: {activation_code}"
+    )
     return Tokens(access_token=access, refresh_token=refresh)
 
 
-@router.post('/token/refresh')
-async def refresh_token(refresh_token: TokenRefresh, current_user: CurActiveUserDep) -> Tokens:
+@router.post("/token/refresh")
+async def refresh_token(
+    refresh_token: TokenRefresh, current_user: CurActiveUserDep
+) -> Tokens:
     try:
         access, refresh = await refresh_all_tokens(refresh_token)
         return Tokens(access_token=access, refresh_token=refresh)
     except (PyJWTError, InvalidTokenError, ExpiredSignatureError):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid refresh token")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="invalid refresh token"
+        )

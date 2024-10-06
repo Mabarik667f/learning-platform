@@ -7,7 +7,10 @@ from .db import async_engine
 
 from models import *
 
-AsyncSessionMaker = async_sessionmaker(async_engine, class_=AsyncSession, expire_on_commit=False)
+AsyncSessionMaker = async_sessionmaker(
+    async_engine, class_=AsyncSession, expire_on_commit=False
+)
+
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
     async with AsyncSessionMaker() as session:
@@ -19,8 +22,12 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
         finally:
             await session.close()
 
-async def get_async_session_maker() -> AsyncGenerator[async_sessionmaker[AsyncSession], Any]:
+
+async def get_async_session_maker() -> (
+    AsyncGenerator[async_sessionmaker[AsyncSession], Any]
+):
     yield AsyncSessionMaker
+
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
 AsyncSessionMakerDep = Annotated[async_sessionmaker, Depends(get_async_session_maker)]

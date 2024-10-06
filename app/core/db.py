@@ -11,6 +11,7 @@ async_engine = create_async_engine(str(settings.ASYNC_DB_URI), echo=True)
 
 pk = Annotated[int, mapped_column(BigInteger, Identity(), primary_key=True)]
 
+
 class Base(DeclarativeBase):
 
     def __repr__(self) -> str:

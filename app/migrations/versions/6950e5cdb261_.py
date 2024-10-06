@@ -26,12 +26,8 @@ def upgrade() -> None:
         sa.Column("user_id", sa.BigInteger(), nullable=False),
         sa.Column("course_id", sa.BigInteger(), nullable=False),
         sa.Column("is_selected", sa.Boolean(), nullable=False),
-        sa.ForeignKeyConstraint(
-            ["course_id"], ["course.id"], ondelete="CASCADE"
-        ),
-        sa.ForeignKeyConstraint(
-            ["user_id"], ["user_account.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["course_id"], ["course.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["user_id"], ["user_account.id"], ondelete="CASCADE"),
         sa.PrimaryKeyConstraint("user_id", "course_id"),
     )
     op.drop_index("ix_category_slug", table_name="category")

@@ -1,6 +1,7 @@
 from loguru import logger
 from core.config import settings
 
+
 class MailingCodeUtils:
     def __init__(self, username) -> None:
         self.username = username
