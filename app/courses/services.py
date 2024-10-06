@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.ext.asyncio.session import async_sessionmaker
 from sqlalchemy.orm import joinedload
 
-from app.categories.shemas import CategoryResponse
+from categories.shemas import CategoryResponse
 from models.courses import (
     Course,
     Section as SectionModel,
