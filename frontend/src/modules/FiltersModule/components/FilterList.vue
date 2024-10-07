@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, SetupContext, watch, PropType } from "vue";
-import { FilterOption } from "../interfaces/FilterOption";
+import { FilterOption } from "../interfaces";
 import { selectOption, unSelectOption } from "../helpers/useToggleOptions";
 
 export default defineComponent({

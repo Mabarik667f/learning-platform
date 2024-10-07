@@ -1,7 +1,5 @@
 import { Router } from "vue-router";
-import { QueryParams } from "../interfaces/QueryParams";
-import { FilterOption } from "../interfaces/FilterOption";
-import { Prices } from "../interfaces/Prices";
+import { QueryParams, FilterOption, Prices } from "../interfaces";
 
 export const getQueryParams = (
   prices: Prices,

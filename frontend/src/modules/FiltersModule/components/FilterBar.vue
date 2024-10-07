@@ -1,17 +1,14 @@
 <script lang="ts">
+import { defineComponent, onMounted, SetupContext, ref, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { defineComponent, ref, watch } from "vue";
 import { getCategories } from "@/modules/CategoriesModule";
-import { FilterOption } from "../interfaces/FilterOption";
-import { Prices } from "../interfaces/Prices";
+import { getDifficulties } from "@modules/CoursesModule";
+import { getQueryParams, updateRouteQueryParams } from "../helpers/queryParams";
+import { FilterOption, Prices } from "../interfaces";
 import FilterInp from "./FilterInp.vue";
 import FilterBetween from "./FilterBetween.vue";
 import FilterList from "./FilterList.vue";
 import ApplyButton from "./ApplyButton.vue";
-import { onMounted } from "vue";
-import { getDifficulties } from "@modules/CoursesModule";
-import { getCourseList } from "@modules/CoursesModule";
-import { getQueryParams, updateRouteQueryParams } from "../helpers/queryParams";
 
 export default defineComponent({
     components: {
@@ -20,7 +17,8 @@ export default defineComponent({
         FilterList,
         ApplyButton,
     },
-    setup() {
+    emits: ["updateQueryParams"],
+    setup(_, { emit }: SetupContext) {
         const router = useRouter();
         const route = useRoute();
 
@@ -36,9 +34,12 @@ export default defineComponent({
             max_price: "",
         });
 
-        onMounted(async () => await updateQueryParams());
+        onMounted(async () => {
+            await setQueryParams();
+            emit("updateQueryParams", route.fullPath);
+        });
 
-        const updateQueryParams = async () => {
+        const setQueryParams = async () => {
             categories.value = await getCategories();
             difficulties.value = await getDifficulties();
 
@@ -61,8 +62,6 @@ export default defineComponent({
             queryCat.value = (route.query.queryCat as string) || "";
             prices.value.min_price = (route.query.min_price as string) || "";
             prices.value.max_price = (route.query.max_price as string) || "";
-
-            await getCourseList(route.fullPath);
         };
 
         const handleSingleInp = (newVal: any, model: string) => {
@@ -107,7 +106,7 @@ export default defineComponent({
         watch(
             () => route.fullPath,
             async (newPath: string) => {
-                await getCourseList(newPath);
+                emit("updateQueryParams", newPath);
             },
         );
         return {

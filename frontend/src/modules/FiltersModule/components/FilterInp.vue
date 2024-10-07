@@ -2,7 +2,6 @@
 import { PropType, ref, SetupContext } from "vue";
 import { defineComponent } from "vue";
 import { updateSingleVal } from "@modules/FiltersModule";
-import { useRoute } from "vue-router";
 import { watch } from "vue";
 
 export default defineComponent({

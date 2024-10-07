@@ -1,5 +1,5 @@
 import { Ref } from "vue";
-import { FilterOption } from "../interfaces/FilterOption";
+import { FilterOption } from "../interfaces";
 
 export const selectOption = async (
   selectedOptions: Ref<FilterOption[]>,
