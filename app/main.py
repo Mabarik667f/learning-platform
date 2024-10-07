@@ -1,6 +1,7 @@
 import sys
 
 from fastapi import FastAPI, status
+from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from fastapi import Request
@@ -35,6 +36,7 @@ logger.add(
 app = FastAPI()
 
 app.include_router(api_router)
+app.mount("/media", StaticFiles(directory="media"), name="media")
 
 if settings.BACKEND_CORS:
     app.add_middleware(
