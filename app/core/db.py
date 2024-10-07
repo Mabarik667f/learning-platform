@@ -5,8 +5,8 @@ from typing import Annotated
 
 from .config import settings
 
-sync_engine = create_engine(str(settings.SYNC_DB_URI), echo=True)
-async_engine = create_async_engine(str(settings.ASYNC_DB_URI), echo=True)
+sync_engine = create_engine(str(settings.SYNC_DB_URI), echo=settings.ECHO_DB)
+async_engine = create_async_engine(str(settings.ASYNC_DB_URI), echo=settings.ECHO_DB)
 
 
 pk = Annotated[int, mapped_column(BigInteger, Identity(), primary_key=True)]
