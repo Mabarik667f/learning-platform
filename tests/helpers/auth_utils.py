@@ -13,17 +13,15 @@ class BearerAuth(httpx.Auth):
         self.app = app
         self.user = user
 
-    async def async_auth_flow(self, request: Request) -> AsyncGenerator[Request, Response]:
+    async def async_auth_flow(
+        self, request: Request
+    ) -> AsyncGenerator[Request, Response]:
         token = await self.async_get_token()
         request.headers["Authorization"] = f"Bearer {token}"
         yield request
 
-    async def async_get_token(self):
-        async with AsyncClient(transport=ASGITransport(app=self.app), base_url="http://test") as client: #type: ignore
+    async def async_get_token(self) -> dict:
+        async with AsyncClient(transport=ASGITransport(app=self.app), base_url="http://test") as client:  # type: ignore
             response = await client.post("/auth/token", data=self.user)
             token_data = response.json()
-            return token_data.get('access_token')
-
-
-def get_auth_header(auth_token: str):
-    return {"Authorization": f"Bearer {auth_token}"}
+            return {"Authorization": f"Bearer {token_data.get("access_token")}"}
