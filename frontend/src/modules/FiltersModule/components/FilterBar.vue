@@ -1,5 +1,12 @@
 <script lang="ts">
-import { defineComponent, onMounted, SetupContext, ref, watch } from "vue";
+import {
+    defineComponent,
+    onMounted,
+    SetupContext,
+    ref,
+    watch,
+    computed,
+} from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { getCategories } from "@/modules/CategoriesModule";
 import { getDifficulties } from "@modules/CoursesModule";
@@ -9,6 +16,7 @@ import FilterInp from "./FilterInp.vue";
 import FilterBetween from "./FilterBetween.vue";
 import FilterList from "./FilterList.vue";
 import ApplyButton from "./ApplyButton.vue";
+import { useCategoryStore } from "@/modules/CategoriesModule";
 
 export default defineComponent({
     components: {
@@ -19,16 +27,26 @@ export default defineComponent({
     },
     emits: ["updateQueryParams"],
     setup(_, { emit }: SetupContext) {
+        const categoryStore = useCategoryStore();
+
         const router = useRouter();
         const route = useRoute();
 
-        const categories = ref<FilterOption[]>([]);
+        const categories = computed({
+            get: () => categoryStore.categories,
+            set: async () => await categoryStore.fetchCategories(),
+        });
+
         const difficulties = ref<FilterOption[]>([]);
 
         const selectedCats = ref<FilterOption[]>([]);
         const selectedDifficulties = ref<FilterOption[]>([]);
 
-        const queryCat = ref<string>("");
+        const queryCat = computed({
+            get: () => categoryStore.categorySearchQuery,
+            set: (query: string) => categoryStore.setCategoryQuery(query),
+        });
+
         const prices = ref<Prices>({
             min_price: "",
             max_price: "",
@@ -40,7 +58,7 @@ export default defineComponent({
         });
 
         const setQueryParams = async () => {
-            categories.value = await getCategories();
+            await categoryStore.fetchCategories();
             difficulties.value = await getDifficulties();
 
             const queryDifficulties: string[] =
@@ -59,15 +77,25 @@ export default defineComponent({
                     queryDifficulties.includes(diff.title),
                 ) || [];
 
-            queryCat.value = (route.query.queryCat as string) || "";
+            categoryStore.setCategoryQuery(
+                (route.query.queryCat as string) || "",
+            );
             prices.value.min_price = (route.query.min_price as string) || "";
             prices.value.max_price = (route.query.max_price as string) || "";
         };
 
-        const handleSingleInp = (newVal: any, model: string) => {
+        watch(
+            () => queryCat.value,
+            (_) => {
+                categoryStore.filterCategories();
+            },
+        );
+
+        const handleSingleInp = async (newVal: any, model: string) => {
             switch (model) {
                 case "queryCat":
-                    queryCat.value = newVal;
+                    categoryStore.setCategoryQuery(newVal);
+                    await updateRoute();
                     break;
                 case "minPrice":
                     prices.value.min_price = newVal;
