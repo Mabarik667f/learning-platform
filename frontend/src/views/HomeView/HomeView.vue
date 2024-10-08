@@ -2,7 +2,7 @@
 import { defineComponent, ref } from "vue";
 import { SearchField } from "@/modules/SearchModule";
 import { FilterBar } from "@/modules/FiltersModule";
-import { CourseList } from "@/modules/CoursesModule";
+import { CourseList, useCourseStore } from "@/modules/CoursesModule";
 
 export default defineComponent({
     components: {
@@ -11,11 +11,19 @@ export default defineComponent({
         CourseList,
     },
     setup() {
+        const store = useCourseStore();
+        const setCourseSearchQuery = store.setCourseQuery;
+
         const queryParams = ref<string>("");
         const updateCourseList = async (params: string) => {
             queryParams.value = params;
         };
-        return { updateCourseList, queryParams };
+
+        return {
+            updateCourseList,
+            queryParams,
+            setCourseSearchQuery,
+        };
     },
 });
 </script>
@@ -23,12 +31,12 @@ export default defineComponent({
 <template>
     <div class="home">
         <div class="search-con">
-            <SearchField />
+            <SearchField @getSearchQuery="setCourseSearchQuery($event)" />
         </div>
         <div class="filters-con">
             <FilterBar @updateQueryParams="updateCourseList($event)" />
         </div>
-        <div>
+        <div class="courses">
             <CourseList :queryParams="queryParams" />
         </div>
     </div>
@@ -55,6 +63,11 @@ export default defineComponent({
     justify-content: flex-start;
     margin: 0;
     padding: 0;
+    width: 100%;
+}
+
+.courses {
+    display: flex;
     width: 100%;
 }
 </style>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, SetupContext } from "vue";
 import SearchButton from "./SearchButton.vue";
 import SearchInput from "./SearchInput.vue";
 export default defineComponent({
@@ -7,12 +7,19 @@ export default defineComponent({
         SearchInput,
         SearchButton,
     },
+    emits: ["getSearchQuery"],
+    setup(_, { emit }: SetupContext) {
+        const getSearchQuery = (query: string) => {
+            emit("getSearchQuery", query);
+        };
+        return { getSearchQuery };
+    },
 });
 </script>
 
 <template>
     <div class="search">
-        <SearchInput />
+        <SearchInput @search="getSearchQuery" />
         <SearchButton />
     </div>
 </template>

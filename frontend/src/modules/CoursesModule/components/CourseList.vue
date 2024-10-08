@@ -1,7 +1,11 @@
 <script lang="ts">
-import { defineComponent, ref, PropType, watch } from "vue";
-import getCourseList from "../api/getCourseList";
+import { defineComponent, PropType, watch, computed } from "vue";
+import CourseCard from "./CourseCard.vue";
+import { useCourseStore } from "@modules/CoursesModule";
 export default defineComponent({
+    components: {
+        CourseCard,
+    },
     props: {
         queryParams: {
             default: "",
@@ -9,18 +13,29 @@ export default defineComponent({
         },
     },
     setup(props) {
-        const courses = ref<Object>({});
-        const query = ref<string>(props.queryParams);
+        const store = useCourseStore();
+        const searchQuery = computed({
+            get: () => store.courseSearchQuery,
+            set: (value: string) => store.setCourseQuery(value),
+        });
 
-        const getCourses = async () => {
-            courses.value = await getCourseList(query.value);
-        };
+        const courses = computed({
+            get: () => store.courses,
+            set: async () => await store.fetchCourses(props.queryParams),
+        });
 
         watch(
             () => props.queryParams,
             async (newParams) => {
-                query.value = newParams;
-                await getCourses();
+                await store.fetchCourses(newParams);
+            },
+        );
+
+        watch(
+            () => searchQuery.value,
+            (query) => {
+                store.setCourseQuery(query);
+                store.filterCourses();
             },
         );
 
@@ -29,8 +44,19 @@ export default defineComponent({
 });
 </script>
 <template>
-    <div>
-        {{ courses }}
-    </div>
+    <ul class="courses-list">
+        <div v-if="courses.length < 1">
+            <h2>Ничего не найдено!</h2>
+        </div>
+        <li v-else v-for="course in courses" :key="course.id">
+            <CourseCard :course="course" />
+        </li>
+    </ul>
 </template>
-<style scoped></style>
+<style scoped>
+.courses-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+}
+</style>

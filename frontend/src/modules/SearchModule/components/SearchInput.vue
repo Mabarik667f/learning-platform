@@ -10,7 +10,11 @@ export default defineComponent({
 </script>
 
 <template>
-    <c-input v-model="query" class="search-query"></c-input>
+    <c-input
+        v-model="query"
+        class="search-query"
+        @input="$emit('search', query)"
+    ></c-input>
 </template>
 
 <style scoped>
