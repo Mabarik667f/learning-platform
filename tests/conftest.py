@@ -1,9 +1,13 @@
 import asyncio
+from pathlib import Path
 import pytest
+import os
 
 from typing import Any
 from collections.abc import AsyncGenerator
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 
@@ -50,6 +54,7 @@ app.dependency_overrides[core.deps.get_async_session_maker] = (
 async def setup():
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+        await start_all_sql_fixtures(conn)
     yield
     async with async_engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
@@ -69,3 +74,22 @@ def event_loop(request):
 async def client():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore
         yield client
+
+
+@pytest.fixture
+async def session() -> AsyncGenerator[AsyncSession, None]:
+    async for conn in connection():
+        yield conn
+
+
+async def start_all_sql_fixtures(conn: AsyncConnection):
+    """read all SQL FILES from sql_scripts and make it"""
+    sql_scripts = os.path.relpath("../sql_scripts")
+    for f in os.listdir(sql_scripts):
+        await execute_sql_script(f, conn)
+
+
+async def execute_sql_script(filename: str, connection: AsyncConnection):
+    path = Path(f"../sql_scripts/{filename}")
+    with open(path, "r") as f:
+        await connection.execute(text(f.read()))

@@ -94,8 +94,12 @@ class Task(Base):
     subsection: Mapped["Subsection"] = relationship(back_populates="tasks")
     task_type: Mapped["TaskType"] = relationship(back_populates="tasks")
 
-    answers: Mapped[list["Answer"]] = relationship(back_populates="task")
-    task_tests: Mapped[list["TaskTest"]] = relationship(back_populates="task")
+    answers: Mapped[list["Answer"]] = relationship(
+        back_populates="task", lazy="selectin"
+    )
+    task_tests: Mapped[list["TaskTest"]] = relationship(
+        back_populates="task", lazy="selectin"
+    )
     submissions: Mapped[list["Submission"]] = relationship(back_populates="task")
 
 
@@ -114,8 +118,7 @@ class TaskTest(Base):
     __tablename__ = "task_test"
 
     id: Mapped[pk]
-    expected_output: Mapped[str] = mapped_column(Text)
-    input: Mapped[str] = mapped_column(Text)
+    test_file: Mapped[str] = mapped_column(Text)
 
     task_id: Mapped[int] = mapped_column(ForeignKey("task.id", ondelete="CASCADE"))
 

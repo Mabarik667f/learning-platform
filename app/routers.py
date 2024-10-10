@@ -4,6 +4,7 @@ from auth.router import router as auth_router
 from categories.router import router as cat
 from courses.router import router as course_router
 from sections.router import router_section, router_subsection
+from tasks.router import router as task_router
 
 api_router = APIRouter()
 
@@ -16,3 +17,5 @@ api_router.include_router(course_router)
 
 api_router.include_router(router_section)
 api_router.include_router(router_subsection)
+
+api_router.include_router(task_router)
