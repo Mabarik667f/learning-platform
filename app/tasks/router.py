@@ -45,3 +45,8 @@ async def get_task(task_crud: TaskCrudDp, current_user: CurActiveUserDep, task_i
         answers=from_obj_to_model_answers(obj.answers),
         task_tests=from_obj_to_model_tests(obj.task_tests)
     )
+
+
+@router.delete("/delete/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_task(task_crud: TaskCrudDp, current_user: CurActiveUserDep, task_id: int):
+    await task_crud.delete_task(task_id)

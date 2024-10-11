@@ -11,7 +11,7 @@ from .helpers.test_class import BaseTestClass
 
 
 @pytest.mark.usefixtures("create_subsection")
-class TestsForTask(BaseTestClass):
+class TestsForTasks(BaseTestClass):
 
     prefix = "/tasks"
 
@@ -26,8 +26,7 @@ class TestsForTask(BaseTestClass):
             task_id = await utils.get_task_type_id(task_name)
 
     async def test_create_task(self, client: AsyncClient, token: dict):
-        headers = dict()
-        headers.update(token)
+        self.headers.update(token)
 
         data = {
             "task_type": {"name": "test"},
@@ -37,7 +36,7 @@ class TestsForTask(BaseTestClass):
         }
 
         response = await client.post(
-            self.get_endpoint("create"), json=data, headers=headers
+            self.get_endpoint("create"), json=data, headers=self.headers
         )
         assert response.status_code == 201
         assert response.json().get("video_path") == "test_files/s.txt"
@@ -53,7 +52,7 @@ class TestsForTask(BaseTestClass):
         }
 
         response = await client.post(
-            self.get_endpoint("create"), json=data, headers=headers
+            self.get_endpoint("create"), json=data, headers=self.headers
         )
         assert response.status_code == 201
         assert len(response.json().get("answers")) == 2
@@ -70,34 +69,29 @@ class TestsForTask(BaseTestClass):
         }
 
         response = await client.post(
-            self.get_endpoint("create"), json=data, headers=headers
+            self.get_endpoint("create"), json=data, headers=self.headers
         )
         assert response.status_code == 201
         assert len(response.json().get("task_tests")) == 2
 
+    @pytest.mark.usefixtures("create_task")
     async def test_get_task(self, client: AsyncClient, token: dict):
-        headers = dict()
-        headers.update(token)
-
-        data = {
-            "task_type": {"name": "test"},
-            "text": "This text for test-task 2",
-            "subsection_id": 1,
-            "video_path": "test_files/s.txt",
-            "task_tests": [
-                {"test_file": "test_files/s.txt"},
-                {"test_file": "test_files/t.py"},
-            ],
-            "answers": [
-                {"text": "first", "is_correct": False},
-                {"text": "second", "is_correct": True},
-            ],
-        }
-
-        await client.post(self.get_endpoint("create"), json=data, headers=headers)
+        self.headers.update(token)
 
         task_id = 1
-        response = await client.get(self.get_endpoint(task_id), headers=headers)
+        response = await client.get(self.get_endpoint(task_id), headers=self.headers)
         res = response.json()
         assert response.status_code == 200
         assert len(res.get("task_tests")) == 2 and len(res.get("answers")) == 2
+
+    @pytest.mark.usefixtures("create_task")
+    async def test_delete_task(self, client: AsyncClient, token: dict):
+        self.headers.update(token)
+
+        task_id = 1
+        response = await client.delete(self.get_endpoint(f'delete/{task_id}'), headers=self.headers)
+        assert response.status_code == 204
+
+    # @pytest.mark.usefixtures("create_task")
+    # async def test_patch_task(self, client: AsyncClient, token: dict):
+    #     self.headers.update(token)

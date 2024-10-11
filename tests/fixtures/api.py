@@ -40,3 +40,24 @@ async def create_section(client: AsyncClient, create_course, token: dict):
 async def create_subsection(client: AsyncClient, create_section, token: dict):
     data = {"title": "Test title 1", "section_id": 1, "position": 1}
     await client.post("/subsections/create", json=data, headers=token)
+
+
+@pytest.fixture
+async def create_task(client: AsyncClient, create_subsection, token: dict):
+
+    data = {
+        "task_type": {"name": "test"},
+        "text": "This text for test-task 2",
+        "subsection_id": 1,
+        "video_path": "test_files/s.txt",
+        "task_tests": [
+            {"test_file": "test_files/s.txt"},
+            {"test_file": "test_files/t.py"},
+        ],
+        "answers": [
+            {"text": "first", "is_correct": False},
+            {"text": "second", "is_correct": True},
+        ],
+    }
+
+    await client.post("/tasks/create", json=data, headers=token)

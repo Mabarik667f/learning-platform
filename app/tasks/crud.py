@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from models.courses import Task as TaskModel
 from core.crud import BaseCrud
-from .shemas import Answer, CreateTask, TaskTest, TaskType
+from .shemas import Answer, CreateTask, TaskTest, TaskType, UpdateTask
 from .utils import TaskUtils
 
 
@@ -47,6 +47,14 @@ class TaskCrud(BaseCrud):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={"task": "Задание не найдено !"},
             )
+
+    async def delete_task(self, task_id: int) -> None:
+        obj = await self.get_task(task_id)
+        await self.session.delete(obj)
+        await self.session.commit()
+
+    async def patch_task(self, task_id: int, task_for_update: UpdateTask) -> TaskModel:
+        pass
 
     def get_task_utils(self) -> TaskUtils:
         return TaskUtils(self.session)

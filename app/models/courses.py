@@ -54,7 +54,7 @@ class Section(Base):
 
     course: Mapped["Course"] = relationship(back_populates="sections")
     subsections: Mapped[List["Subsection"]] = relationship(
-        back_populates="section", lazy="selectin"
+        back_populates="section", lazy="selectin", cascade="all, delete", passive_deletes=True
     )
 
 
@@ -71,7 +71,8 @@ class Subsection(Base):
     )
 
     section: Mapped["Section"] = relationship(back_populates="subsections")
-    tasks: Mapped[List["Task"]] = relationship(back_populates="subsection")
+    tasks: Mapped[List["Task"]] = relationship(back_populates="subsection",
+        cascade="all, delete", passive_deletes=True)
 
 
 class Task(Base):
@@ -95,10 +96,10 @@ class Task(Base):
     task_type: Mapped["TaskType"] = relationship(back_populates="tasks")
 
     answers: Mapped[list["Answer"]] = relationship(
-        back_populates="task", lazy="selectin"
+        back_populates="task", lazy="selectin", cascade="all, delete", passive_deletes=True
     )
     task_tests: Mapped[list["TaskTest"]] = relationship(
-        back_populates="task", lazy="selectin"
+        back_populates="task", lazy="selectin", passive_deletes=True, cascade="all, delete"
     )
     submissions: Mapped[list["Submission"]] = relationship(back_populates="task")
 

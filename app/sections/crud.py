@@ -47,11 +47,7 @@ class SectionCrud(BaseCrud):
 
     async def delete_section(self, section_id: int) -> NoReturn:
 
-        section_obj = await self.get_section(section_id, load_selectin=True)
-        subssection_ids: list[int] = [s.id for s in section_obj.subsections]
-        del_q = delete(SubSectionModel).where(SubSectionModel.id.in_(subssection_ids))
-
-        await self.session.execute(del_q)
+        section_obj = await self.get_section(section_id)
         await self.session.delete(section_obj)
         await self.session.commit()
 
@@ -146,7 +142,6 @@ class SubSectionCrud(BaseCrud):
         return subsection_obj
 
     async def delete_subsection(self, subsection_id: int) -> NoReturn:
-        # fix this - delete all tasks ?
         subsection_obj = await self.get_subsection(subsection_id)
         await self.session.delete(subsection_obj)
         await self.session.commit()

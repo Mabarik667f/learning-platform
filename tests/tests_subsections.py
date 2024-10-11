@@ -7,7 +7,7 @@ from .helpers.test_class import BaseTestClass
 
 
 @pytest.mark.usefixtures("create_section")
-class TestForSubsections(BaseTestClass):
+class TestsForSubsections(BaseTestClass):
 
     prefix = "/subsections"
 

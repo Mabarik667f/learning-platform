@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from tasks.shemas import Task
+from tasks.shemas import CreateTask, Task
 
 
 class SectionBase(BaseModel):
@@ -47,6 +47,7 @@ class UpdateSubSection(SubSectionBase):
 
 class CreateSubSection(SubSectionBase):
     section_id: int = Field(gt=0)
+    tasks: list["CreateTask"] = Field(default=[])
 
 
 class SubSectionResponse(SubSectionBase):
