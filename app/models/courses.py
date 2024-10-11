@@ -82,7 +82,6 @@ class Task(Base):
     text: Mapped[str | None] = mapped_column(Text, nullable=False)
     video_path: Mapped[str] = mapped_column(String, nullable=True)
 
-    todo: Mapped[bool] = mapped_column(default=False)
     scores: Mapped[int] = mapped_column(CheckConstraint("scores > 0"), nullable=False)
 
     task_type_id: Mapped[int] = mapped_column(
@@ -143,6 +142,7 @@ class Submission(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("user_account.id", ondelete="CASCADE")
     )
+    todo: Mapped[bool] = mapped_column(default=False)
 
     submission_date: Mapped[str] = mapped_column(DateTime, default=datetime.utcnow)
     submission_code: Mapped[str] = mapped_column(Text)

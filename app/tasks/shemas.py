@@ -1,11 +1,14 @@
 from pydantic import BaseModel, Field, FilePath
-from models.courses import Answer as AnswerModel, TaskTest as TaskTestModel
+from models.courses import (
+    Answer as AnswerModel,
+    TaskTest as TaskTestModel,
+    Task as TaskModel
+)
 
 
 class Task(BaseModel):
     text: str = Field(default="")
     video_path: FilePath | None = Field(default=None)
-    todo: bool = Field(default=False, description="Выполнено")
     scores: int = Field(default=1, gt=0)
 
 
@@ -17,7 +20,7 @@ class CreateTask(Task):
 
 
 class UpdateTask(Task):
-    pass
+    task_type: "TaskType"
 
 
 class AddTaskContent:
@@ -83,3 +86,12 @@ def from_obj_to_model_answers(answers: list[AnswerModel]) -> list[AnswerResponse
 
 def from_obj_to_model_tests(tests: list[TaskTestModel]) -> list[TaskTestResponse]:
     return [TaskTestResponse(**t.to_dict()) for t in tests]
+
+
+def generate_task_response(obj: TaskModel, task_type: str) -> TaskResponse:
+    return TaskResponse(
+        **obj.to_dict(),
+        task_type=TaskType(name=task_type),
+        answers=from_obj_to_model_answers(obj.answers),
+        task_tests=from_obj_to_model_tests(obj.task_tests)
+    )
