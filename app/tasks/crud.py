@@ -1,3 +1,4 @@
+from collections.abc import Container
 from fastapi import HTTPException, status
 from sqlalchemy import select, delete
 from sqlalchemy.exc import NoResultFound
@@ -7,6 +8,8 @@ from models.courses import Task as TaskModel
 from core.crud import BaseCrud
 from .shemas import Answer, CreateTask, TaskTest, TaskType, UpdateTask
 from .utils import TaskUtils
+
+from loguru import logger
 
 
 class TaskCrud(BaseCrud):
@@ -54,7 +57,23 @@ class TaskCrud(BaseCrud):
         await self.session.commit()
 
     async def patch_task(self, task_id: int, task_for_update: UpdateTask) -> TaskModel:
-        pass
+        obj = await self.get_task(task_id)
+        task_dict = task_for_update.dict()
+        task_dict["video_path"] = str(task_dict.get("video_path"))
+
+        if task_dict.get('task_type'):
+            task_type_id = await self.utils.get_task_type_id(TaskType(name=task_dict['task_type']['name']))
+            setattr(obj, "task_type_id", task_type_id)
+
+        for key, val in task_dict.items():
+            logger.info(task_dict[key])
+            if task_dict[key] and isinstance(task_dict[key], (str, int)):
+                logger.info(task_dict[key])
+                setattr(obj, key, val)
+
+        await self.session.commit()
+        await self.session.refresh(obj)
+        return obj
 
     def get_task_utils(self) -> TaskUtils:
         return TaskUtils(self.session)
