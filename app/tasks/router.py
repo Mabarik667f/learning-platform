@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Depends, Form, File, UploadFile, status
 
 from users.deps import CurActiveUserDep
 
@@ -21,9 +21,11 @@ router = APIRouter(prefix="/tasks", tags=["tasks"])
 async def create_task(
     task_crud: TaskCrudDp,
     current_user: CurActiveUserDep,
-    task_for_create: CreateTask,
+    video: UploadFile,
+    task_tests: list[UploadFile] = File(None),
+    task_for_create: CreateTask = Depends(CreateTask.as_form),
 ):
-    obj = await task_crud.create_task(task_for_create)
+    obj = await task_crud.create_task(task_for_create, video, task_tests)
     return generate_task_response(obj, task_for_create.task_type.name)
 
 
@@ -37,19 +39,22 @@ async def get_task(task_crud: TaskCrudDp, current_user: CurActiveUserDep, task_i
 
 
 @router.delete("/delete/{task_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_task(task_crud: TaskCrudDp, current_user: CurActiveUserDep, task_id: int):
+async def delete_task(
+    task_crud: TaskCrudDp, current_user: CurActiveUserDep, task_id: int
+):
     await task_crud.delete_task(task_id)
 
 
-@router.patch("/patch/{task_id}", response_model=TaskResponse, status_code=status.HTTP_200_OK)
+@router.patch(
+    "/patch/{task_id}", response_model=TaskResponse, status_code=status.HTTP_200_OK
+)
 async def patch_task(
     task_crud: TaskCrudDp,
-    current_use: CurActiveUserDep,
+    current_user: CurActiveUserDep,
     task_id: int,
-    new_task_data: UpdateTask
+    new_task_data: UpdateTask = Depends(UpdateTask.as_form),
+    file: UploadFile = File(None),
 ):
-    obj = await task_crud.patch_task(task_id, new_task_data)
-    task_type = (
-        await task_crud.get_task_utils().get_task_type_object(obj.task_type_id)
-    )
+    obj = await task_crud.patch_task(task_id, new_task_data, file)
+    task_type = await task_crud.get_task_utils().get_task_type_object(obj.task_type_id)
     return generate_task_response(obj, task_type)

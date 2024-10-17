@@ -1,8 +1,15 @@
+import inspect
+import json
+from typing import Annotated
+from fastapi import Form
 from pydantic import BaseModel, Field, FilePath
+
+from loguru import logger
+
 from models.courses import (
     Answer as AnswerModel,
     TaskTest as TaskTestModel,
-    Task as TaskModel
+    Task as TaskModel,
 )
 
 
@@ -10,17 +17,51 @@ class Task(BaseModel):
     text: str = Field(default="")
     video_path: FilePath | None = Field(default=None)
     scores: int = Field(default=1, gt=0)
-
+    task_type: "TaskType"
 
 class CreateTask(Task):
-    task_type: "TaskType"
     subsection_id: int = Field(gt=0)
     answers: list["Answer"] = Field(default=[])
-    task_tests: list["TaskTest"] = Field(default=[])
+
+    @classmethod
+    def as_form(
+        cls,
+        text: str = Form(...),
+        scores: int = Form(1),
+        subsection_id: int = Form(1),
+        task_type: str = Form(),
+        answers: list[str] = Form(
+            default=[],
+            description="This json dump Answer Scheme object\n\
+            read a Answer Scheme model and send jsonify object",
+        ),
+    ):
+        answers_m = [Answer(**json.loads(a)) for a in answers]  # type: ignore
+
+        return cls(
+            text=text,
+            video_path=None,
+            scores=scores,
+            task_type=TaskType(name=json.loads(task_type)["name"]),
+            subsection_id=subsection_id,
+            answers=answers_m,
+        )
 
 
 class UpdateTask(Task):
-    task_type: "TaskType"
+    pass
+
+    @classmethod
+    def as_form(
+        cls,
+        text: str = Form(...),
+        scores: int = Form(1),
+        task_type: str = Form(),
+    ):
+        return cls(
+            text=text,
+            scores=scores,
+            task_type=TaskType(name=json.loads(task_type)["name"]))
 
 
 class AddTaskContent:
@@ -31,7 +72,6 @@ class AddTaskContent:
 class TaskResponse(Task):
     id: int
     subsection_id: int
-    task_type: "TaskType"
     answers: list["AnswerResponse"] = Field(default=[])
     task_tests: list["TaskTestResponse"] = Field(default=[])
 
@@ -61,7 +101,7 @@ class AnswerResponse(Answer):
 
 
 class TaskTest(BaseModel):
-    test_file: FilePath
+    test_file: FilePath | None = None
 
 
 class CreateTaskTest(TaskTest):

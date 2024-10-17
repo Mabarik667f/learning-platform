@@ -1,7 +1,10 @@
+import json
 import pytest
 from httpx import AsyncClient
 
 from loguru import logger
+
+from tests.helpers.dummy_files import create_dummy_txt
 
 
 @pytest.fixture
@@ -46,18 +49,22 @@ async def create_subsection(client: AsyncClient, create_section, token: dict):
 async def create_task(client: AsyncClient, create_subsection, token: dict):
 
     data = {
-        "task_type": {"name": "test"},
+        "task_type": json.dumps({"name": "test"}),
         "text": "This text for test-task 2",
         "subsection_id": 1,
-        "video_path": "test_files/s.txt",
-        "task_tests": [
-            {"test_file": "test_files/s.txt"},
-            {"test_file": "test_files/t.py"},
-        ],
         "answers": [
-            {"text": "first", "is_correct": False},
-            {"text": "second", "is_correct": True},
+            json.dumps({"text": "first", "is_correct": False}),
+            json.dumps({"text": "second", "is_correct": True}),
         ],
     }
 
-    await client.post("/tasks/create", json=data, headers=token)
+    video = create_dummy_txt()
+    task_tests = [
+        ("task_tests", (f"dummy{i}.txt", create_dummy_txt(f"dummy{i}")))
+        for i in range(2)
+    ]
+    files = [("video", ("video.txt", video))] + task_tests
+
+    await client.post(
+        "/tasks/create", files=files, data=data, headers=token
+    )

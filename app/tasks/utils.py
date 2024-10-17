@@ -1,11 +1,16 @@
+from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
+from helpers import UploadMediaFile
 from core.crud import BaseCrud
 from models.courses import (
     TaskType as TaskTypeModel,
     Answer as AnswerModel,
     Task as TaskModel,
     TaskTest as TaskTestModel,
+    Course as CourseModel,
+    Section as SectionModel,
+    Subsection as SubsectionModel,
 )
 from .shemas import Answer, TaskType, TaskTest
 
@@ -39,11 +44,26 @@ class TaskUtils(BaseCrud):
         await self.session.refresh(task)
 
     async def create_tests_for_question(
-        self, tests: list[TaskTest], task: TaskModel
+        self,
+        task: TaskModel,
+        task_tests: list[UploadFile],
+        upload_media: UploadMediaFile,
     ) -> None:
-        for test in tests:
-            test_obj = TaskTestModel(test_file=str(test.test_file), task_id=task.id)
+        for file in task_tests:
+            test_obj = TaskTestModel(test_file="/", task_id=task.id)
             self.session.add(test_obj)
+            await self.session.flush()
+            await upload_media.write_test_for_task(test_obj, file)
             task.task_tests.append(test_obj)
         await self.session.commit()
         await self.session.refresh(task)
+
+    async def get_course_id(self, task_obj: TaskModel) -> int:
+        q = (
+            select(CourseModel.id)
+            .join(SectionModel)
+            .join(SubsectionModel)
+            .filter(SubsectionModel.id == task_obj.subsection_id)
+        )
+        res = await self.session.execute(q)
+        return res.scalar_one()

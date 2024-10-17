@@ -102,6 +102,8 @@ class Task(Base):
     )
     submissions: Mapped[list["Submission"]] = relationship(back_populates="task")
 
+    def get_upload_path_for_video(self, course_id: int):
+        return f"media/course_media/course_{course_id}/course_videos/task_{self.id}/"
 
 class Answer(Base):
     __tablename__ = "answer"
@@ -118,11 +120,14 @@ class TaskTest(Base):
     __tablename__ = "task_test"
 
     id: Mapped[pk]
-    test_file: Mapped[str] = mapped_column(Text)
+    test_file: Mapped[str] = mapped_column(String, nullable=False)
 
     task_id: Mapped[int] = mapped_column(ForeignKey("task.id", ondelete="CASCADE"))
 
     task: Mapped["Task"] = relationship(back_populates="task_tests")
+
+    def get_upload_path_for_test(self, course_id: int):
+        return f"media/course_media/course_{course_id}/course_tests/task_{self.task_id}/"
 
 
 class TaskType(Base):
