@@ -11,8 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 
-import core  # type: ignore
-
+import core #type: ignore
+from app import BASE_PATH
 from core.db import Base  # type: ignore
 from core.config import settings  # type: ignore
 from main import app  # type: ignore
@@ -25,7 +25,6 @@ async_engine = create_async_engine(str(settings.TEST_ASYNC_DB_URI))
 async_session_maker = async_sessionmaker(
     async_engine, class_=AsyncSession, expire_on_commit=False
 )
-
 
 async def connection() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
@@ -84,12 +83,12 @@ async def session() -> AsyncGenerator[AsyncSession, None]:
 
 async def start_all_sql_fixtures(conn: AsyncConnection):
     """read all SQL FILES from sql_scripts and make it"""
-    sql_scripts = os.path.relpath("../sql_scripts")
+    sql_scripts = os.path.relpath(f"{BASE_PATH}/migrations/sql_scripts")
     for f in os.listdir(sql_scripts):
         await execute_sql_script(f, conn)
 
 
 async def execute_sql_script(filename: str, connection: AsyncConnection):
-    path = Path(f"../sql_scripts/{filename}")
+    path = Path(f"{BASE_PATH}/migrations/sql_scripts/{filename}")
     with open(path, "r") as f:
         await connection.execute(text(f.read()))

@@ -1,3 +1,4 @@
+from pathlib import Path
 import redis
 
 from typing_extensions import Optional
@@ -52,6 +53,10 @@ class Settings(BaseSettings):
         return redis.Redis(
             host=self.REDIS_HOST, port=self.REDIS_PORT, decode_responses=True
         )
+
+    @property
+    def MEDIA_PATH(self):
+        return Path("")
 
     REDIS_PORT: int = 6379
     REDIS_HOST: str = "localhost"

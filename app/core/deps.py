@@ -31,3 +31,7 @@ async def get_async_session_maker() -> (
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
 AsyncSessionMakerDep = Annotated[async_sessionmaker, Depends(get_async_session_maker)]
+
+
+def check_type_of_files():
+    pass
