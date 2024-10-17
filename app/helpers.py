@@ -48,6 +48,13 @@ class UploadMediaFile:
         await self.session.commit()
         await self.session.refresh(test_obj)
 
+    async def write_img_for_course(self, course_obj: CourseModel, file: UploadFile):
+        upload_path = Path(course_obj.get_upload_path_for_img())
+        if upload_path.is_dir():
+            self.delete_dir_content(upload_path)
+
+        course_obj.img = await self.write_media_content(file, upload_path)
+
     async def write_media_content(self, file: UploadFile, upload_path: Path) -> str:
         upload_path.mkdir(parents=True, exist_ok=True)
         if not file.filename:

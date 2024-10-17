@@ -40,6 +40,9 @@ class Course(Base):
         back_populates="course", lazy="selectin"
     )
 
+    def get_upload_path_for_img(self):
+        return f"media/course_media/course_{self.id}/course_img/"
+
 
 class Section(Base):
     __tablename__ = "section"

@@ -1,4 +1,4 @@
-from fastapi import Query, status
+from fastapi import Depends, File, Query, UploadFile, status
 from fastapi.responses import Response
 from fastapi.routing import APIRouter
 
@@ -10,7 +10,6 @@ from .shemas import (
     AddCategoriesToCourse,
     CourseAllData,
     CourseDifficulty,
-    CourseListQueryParams,
     CourseResponse,
     CourseWithCategories,
     CreateCourse,
@@ -18,8 +17,8 @@ from .shemas import (
     UpdateCourse,
 )
 from .deps import ListQueryParamsDp, CourseCrudDep
-from .utils import add_categories_to_course, del_category, get_all_difficulties
 from .services import CourseStruct
+from .utils import CourseUtils
 
 from loguru import logger
 
@@ -28,24 +27,28 @@ router = APIRouter(tags=["courses"], prefix="/courses")
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create(
-    course_crud: CourseCrudDep, current_user: CurActiveUserDep, course: CreateCourse
+    course_crud: CourseCrudDep,
+    current_user: CurActiveUserDep,
+    img: UploadFile,
+    course: CreateCourse = Depends(CreateCourse.as_form),
 ) -> CourseResponse:
-    course_obj = await course_crud.create_course(course)
+    course_obj = await course_crud.create_course(course, img)
     return CourseResponse(**course_obj.to_dict())
 
 
-@router.patch("/patch-data")
+@router.patch("/patch/{course_id}")
 async def patch(
     course_crud: CourseCrudDep,
     current_user: CurActiveUserDep,
     course_id: int,
-    course: UpdateCourse,
+    course: UpdateCourse = Depends(UpdateCourse.as_form),
+    img: UploadFile = File(None)
 ) -> CourseResponse:
-    course_obj = await course_crud.patch_course(course, course_id)
+    course_obj = await course_crud.patch_course(course, course_id, img)
     return CourseResponse(**course_obj.to_dict())
 
 
-@router.delete("/delete", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/delete/{course_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete(
     course_crud: CourseCrudDep, current_user: CurActiveUserDep, course_id: int
 ):
@@ -66,7 +69,7 @@ async def get_list(
 
 @router.get("/all-difficulties")
 async def get_difficulties(session: SessionDep) -> list[CourseDifficulty]:
-    difficulties = await get_all_difficulties(session)
+    difficulties = await CourseUtils(session).get_all_difficulties()
     return [CourseDifficulty(title=df.title()) for df in difficulties]
 
 
@@ -83,7 +86,7 @@ async def delete_category(
     course_id: int,
     category_id: int,
 ) -> CourseWithCategories:
-    course = await del_category(session, course_id, category_id)
+    course = await CourseUtils(session).del_category(course_id, category_id)
     categories_row = await get_categories_by_ids(session, course.categories)
 
     categories = [Category(**category.to_dict()) for category in categories_row]
@@ -97,8 +100,8 @@ async def add_categories(
     course_id: int,
     added_categories: AddCategoriesToCourse,
 ) -> CourseWithCategories:
-    course = await add_categories_to_course(
-        session, course_id, category_ids=added_categories.category_ids
+    course = await CourseUtils(session).add_categories_to_course(
+        course_id, category_ids=added_categories.category_ids
     )
     categories_row = await get_categories_by_ids(session, course.categories)
 

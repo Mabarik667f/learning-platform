@@ -1,4 +1,4 @@
-from fastapi import HTTPException, status
+from fastapi import HTTPException, UploadFile, status
 from sqlalchemy import delete, Row
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,16 +10,19 @@ from models.categories import Category, CourseHasCategory
 from models.courses import Course as CourseModel
 from categories.utils import get_list_categories
 from collections.abc import Sequence
+from helpers import UploadMediaFile
 
+from .utils import CourseUtils
 from .shemas import CourseListQueryParams, CreateCourse, UpdateCourse
 
 from loguru import logger
 
 
 class CourseCrud(BaseCrud):
-    async def create_course(self, course_data: CreateCourse) -> CourseModel:
+    async def create_course(self, course_data: CreateCourse, img: UploadFile) -> CourseModel:
         cr_dict = course_data.dict()
         category_ids = cr_dict.pop("categories")
+        cr_dict['img'] = "/"
         course = CourseModel(**cr_dict)
 
         categories = await get_list_categories(self.session, category_ids=category_ids)
@@ -29,6 +32,11 @@ class CourseCrud(BaseCrud):
             )
 
         self.session.add(course)
+        await self.session.flush()
+
+        upload_media = UploadMediaFile(course.id, self.session)
+        await upload_media.write_img_for_course(course, img)
+
         await self.session.commit()
         await self.session.refresh(course)
         return course
@@ -46,11 +54,15 @@ class CourseCrud(BaseCrud):
             await self.session.commit()
 
     async def patch_course(
-        self, course_data: UpdateCourse, course_id: int
+        self, course_data: UpdateCourse, course_id: int, img: UploadFile
     ) -> CourseModel:
         course_obj = await self.get_course(course_id)
         for key, val in course_data.dict().items():
-            setattr(course_obj, key, val)
+            if val is not None:
+                setattr(course_obj, key, val)
+
+        if img:
+           await self.get_course_utils().upload_course_img(course_obj, img)
 
         await self.session.commit()
         await self.session.refresh(course_obj)
@@ -67,18 +79,6 @@ class CourseCrud(BaseCrud):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail={"id": "Курс не найден!"},
             )
-
-    async def get_course_selectionload(self, course_id: int) -> CourseModel:
-        course = await self.session.get(
-            CourseModel, course_id, options=[selectinload(CourseModel.categories)]
-        )
-        if course is not None:
-            return course
-
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail={"course": "Курс не найден !"},
-        )
 
     async def get_list_course(
         self, params: CourseListQueryParams, limit: int, offset: int
@@ -103,3 +103,6 @@ class CourseCrud(BaseCrud):
         # add limit + offset
         res = await self.session.execute(q)
         return res.scalars().all()
+
+    def get_course_utils(self):
+        return CourseUtils(self.session)

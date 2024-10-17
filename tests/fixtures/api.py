@@ -4,7 +4,7 @@ from httpx import AsyncClient
 
 from loguru import logger
 
-from tests.helpers.dummy_files import create_dummy_txt
+from tests.helpers.dummy_files import create_dummy_txt, create_dummy_img
 
 
 @pytest.fixture
@@ -16,15 +16,17 @@ async def create_categories(client: AsyncClient, token: dict):
 
 @pytest.fixture
 async def create_course(client: AsyncClient, create_categories, token: dict):
+
     data = {
         "title": "string",
         "describe": "string",
-        "img": "string",
         "price": 1,
         "difficulty": "easy",
         "categories": [1],
     }
-    await client.post("/courses/create", json=data, headers=token)
+    img = create_dummy_img()
+
+    await client.post("/courses/create", files={"img": img}, data=data, headers=token)
 
 
 @pytest.fixture

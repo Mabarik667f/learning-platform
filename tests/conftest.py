@@ -93,10 +93,3 @@ async def execute_sql_script(filename: str, connection: AsyncConnection):
     path = Path(f"../sql_scripts/{filename}")
     with open(path, "r") as f:
         await connection.execute(text(f.read()))
-
-
-# @pytest.fixture(autouse=True)
-# async def change_dir(request, monkeypatch):
-#     logger.info(request.fspath)
-#     logger.info(request.fspath.dirname)
-#     monkeypatch.chdir("/home/mamba/projects/learning_platform/app/")

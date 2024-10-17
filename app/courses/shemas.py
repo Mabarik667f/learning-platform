@@ -1,4 +1,6 @@
+from pydantic import FilePath
 from pydantic.fields import Field
+from fastapi import Form
 from pydantic.main import BaseModel
 from pydantic.types import PositiveInt
 
@@ -14,7 +16,7 @@ from models.courses import Difficulty
 class CourseBase(BaseModel):
     title: str
     describe: str | None = None
-    img: str
+    img: FilePath | None = None
     price: PositiveInt
     difficulty: Difficulty = Field(default=Difficulty.EASY)
 
@@ -22,10 +24,41 @@ class CourseBase(BaseModel):
 class CreateCourse(CourseBase):
     categories: list[int] = [1]
 
+    @classmethod
+    def as_form(
+        cls,
+        title: str = Form(...),
+        describe: str | None = Form(None),
+        price: PositiveInt = Form(...),
+        difficulty: str = Form(Difficulty.EASY),
+        categories: list[int] = Form(...)
+    ):
+        return cls(
+            title=title,
+            describe=describe,
+            price=price,
+            difficulty=Difficulty(difficulty),
+            categories=categories
+        )
+
 
 class UpdateCourse(CourseBase):
     pass
 
+    @classmethod
+    def as_form(
+        cls,
+        title: str = Form(...),
+        describe: str | None = Form(None),
+        price: PositiveInt = Form(...),
+        difficulty: str = Form(Difficulty.EASY),
+    ):
+        return cls(
+            title=title,
+            describe=describe,
+            price=price,
+            difficulty=Difficulty(difficulty),
+        )
 
 class AddCategoriesToCourse(BaseModel):
     category_ids: list[int] = [1]
