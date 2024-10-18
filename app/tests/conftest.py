@@ -92,3 +92,7 @@ async def execute_sql_script(filename: str, connection: AsyncConnection):
     path = Path(f"{BASE_PATH}/migrations/sql_scripts/{filename}")
     with open(path, "r") as f:
         await connection.execute(text(f.read()))
+
+@pytest.fixture(autouse=True)
+async def monkeypatch_media_path(monkeypatch: pytest.MonkeyPatch):
+    monkeypatch.chdir("./app/tests/")

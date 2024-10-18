@@ -54,9 +54,7 @@ class Settings(BaseSettings):
             host=self.REDIS_HOST, port=self.REDIS_PORT, decode_responses=True
         )
 
-    @property
-    def MEDIA_PATH(self):
-        return Path("")
+    MEDIA_PATH: str = "media/"
 
     REDIS_PORT: int = 6379
     REDIS_HOST: str = "localhost"

@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.properties import ForeignKey
 from sqlalchemy.sql.sqltypes import Text
 from core.db import Base, pk
+from core.config import settings
 from datetime import datetime
 
 if TYPE_CHECKING:
@@ -41,7 +42,7 @@ class Course(Base):
     )
 
     def get_upload_path_for_img(self):
-        return f"media/course_media/course_{self.id}/course_img/"
+        return f"{settings.MEDIA_PATH}/course_media/course_{self.id}/course_img/"
 
 
 class Section(Base):
@@ -106,7 +107,7 @@ class Task(Base):
     submissions: Mapped[list["Submission"]] = relationship(back_populates="task")
 
     def get_upload_path_for_video(self, course_id: int):
-        return f"media/course_media/course_{course_id}/course_videos/task_{self.id}/"
+        return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/course_videos/task_{self.id}/"
 
 class Answer(Base):
     __tablename__ = "answer"
@@ -130,7 +131,7 @@ class TaskTest(Base):
     task: Mapped["Task"] = relationship(back_populates="task_tests")
 
     def get_upload_path_for_test(self, course_id: int):
-        return f"media/course_media/course_{course_id}/course_tests/task_{self.task_id}/"
+        return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/course_tests/task_{self.task_id}/"
 
 
 class TaskType(Base):
