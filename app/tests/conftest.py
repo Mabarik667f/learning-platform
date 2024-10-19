@@ -1,5 +1,7 @@
 import asyncio
+from importlib import reload
 from pathlib import Path
+import shutil
 import pytest
 import os
 
@@ -11,11 +13,11 @@ from sqlalchemy.ext.asyncio import AsyncConnection
 from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlalchemy.ext.asyncio.session import AsyncSession, async_sessionmaker
 
-import core #type: ignore
+import core
 from app import BASE_PATH
-from core.db import Base  # type: ignore
-from core.config import settings  # type: ignore
-from main import app  # type: ignore
+from core.db import Base
+from core.config import settings
+from main import app
 from tests.fixtures.api import *
 from tests.fixtures.auth import *
 
@@ -68,6 +70,7 @@ def event_loop(request):
     yield loop
     loop.close()
 
+    clear_test_media()
 
 @pytest.fixture
 async def client():
@@ -93,6 +96,11 @@ async def execute_sql_script(filename: str, connection: AsyncConnection):
     with open(path, "r") as f:
         await connection.execute(text(f.read()))
 
+def clear_test_media():
+    shutil.rmtree("test_dir/")
+
 @pytest.fixture(autouse=True)
-async def monkeypatch_media_path(monkeypatch: pytest.MonkeyPatch):
-    monkeypatch.chdir("./app/tests/")
+def monkeypatch_media_path(monkeypatch: pytest.MonkeyPatch):
+    test_dir = Path("test_dir/")
+    test_dir.mkdir(exist_ok=True)
+    monkeypatch.chdir("test_dir/")
