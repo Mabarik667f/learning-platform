@@ -4,7 +4,7 @@ from httpx import AsyncClient
 
 from loguru import logger
 
-from tests.helpers.dummy_files import create_dummy_txt, create_dummy_img
+from tests.helpers.dummy_files import create_dummy_txt, create_dummy_img, create_dummy_video
 
 
 @pytest.fixture
@@ -60,12 +60,12 @@ async def create_task(client: AsyncClient, create_subsection, token: dict):
         ],
     }
 
-    video = create_dummy_txt()
+    video = create_dummy_video()
     task_tests = [
         ("task_tests", (f"dummy{i}.txt", create_dummy_txt(f"dummy{i}")))
         for i in range(2)
     ]
-    files = [("video", ("video.txt", video))] + task_tests
+    files = [("video", ("video.mp4", video))] + task_tests
 
     await client.post(
         "/tasks/create", files=files, data=data, headers=token

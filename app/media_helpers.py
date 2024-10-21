@@ -1,5 +1,5 @@
 import datetime
-from fastapi import UploadFile
+from fastapi import HTTPException, UploadFile
 from pathlib import Path
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
@@ -67,3 +67,8 @@ class UploadMediaFile:
 
 def delete_dir_media(path: str):
     rmtree(path)
+
+
+def check_content_type(types: list[str], file: UploadFile):
+    if file.content_type not in types:
+        raise HTTPException(status_code=400, detail=f"invalid type of file!")

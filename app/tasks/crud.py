@@ -15,7 +15,7 @@ from core.crud import BaseCrud
 from .shemas import Answer, CreateTask, TaskTest, TaskType, UpdateTask
 from .utils import TaskUtils
 
-from helpers import UploadMediaFile, delete_dir_media
+from media_helpers import UploadMediaFile, delete_dir_media
 
 from loguru import logger
 

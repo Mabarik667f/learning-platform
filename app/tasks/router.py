@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, Form, File, UploadFile, status
 
+from media_helpers import check_content_type
 from users.deps import CurActiveUserDep
 
 from .shemas import (
@@ -25,6 +26,7 @@ async def create_task(
     task_tests: list[UploadFile] = File(None),
     task_for_create: CreateTask = Depends(CreateTask.as_form),
 ):
+    check_content_type(["video/mp4"], video)
     obj = await task_crud.create_task(task_for_create, video, task_tests)
     return generate_task_response(obj, task_for_create.task_type.name)
 
@@ -53,8 +55,9 @@ async def patch_task(
     current_user: CurActiveUserDep,
     task_id: int,
     new_task_data: UpdateTask = Depends(UpdateTask.as_form),
-    file: UploadFile = File(None),
+    video: UploadFile = File(None),
 ):
-    obj = await task_crud.patch_task(task_id, new_task_data, file)
+    check_content_type(["video/mp4"], video)
+    obj = await task_crud.patch_task(task_id, new_task_data, video)
     task_type = await task_crud.get_task_utils().get_task_type_object(obj.task_type_id)
     return generate_task_response(obj, task_type)

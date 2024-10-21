@@ -10,7 +10,7 @@ from models.categories import Category, CourseHasCategory
 from models.courses import Course as CourseModel
 from categories.utils import get_list_categories
 from collections.abc import Sequence
-from helpers import UploadMediaFile, delete_dir_media
+from media_helpers import UploadMediaFile, delete_dir_media
 
 from .utils import CourseUtils
 from .shemas import CourseListQueryParams, CreateCourse, UpdateCourse

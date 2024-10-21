@@ -17,5 +17,5 @@ def create_dummy_img(filename: str = "dummy", file_type: str = "png") -> BytesIO
     return image_data
 
 
-def create_dummy_video(self):
-    pass
+def create_dummy_video(filename: str = "dummy.mp4") -> BytesIO:
+    return create_dummy_txt(filename)

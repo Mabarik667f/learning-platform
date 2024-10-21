@@ -6,7 +6,7 @@ from sqlalchemy.orm import selectinload
 
 from models.courses import Course, Difficulty
 from models.categories import Category, CourseHasCategory
-from helpers import UploadMediaFile
+from media_helpers import UploadMediaFile
 
 
 from loguru import logger

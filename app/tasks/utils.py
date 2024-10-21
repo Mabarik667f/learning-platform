@@ -1,7 +1,7 @@
 from fastapi import UploadFile
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
-from helpers import UploadMediaFile
+from media_helpers import UploadMediaFile
 from core.crud import BaseCrud
 from models.courses import (
     TaskType as TaskTypeModel,

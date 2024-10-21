@@ -1,5 +1,6 @@
 from typing import Any, Annotated
 from collections.abc import AsyncGenerator
+from fastapi import UploadFile
 from fastapi.params import Depends
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
@@ -31,7 +32,3 @@ async def get_async_session_maker() -> (
 
 SessionDep = Annotated[AsyncSession, Depends(get_db)]
 AsyncSessionMakerDep = Annotated[async_sessionmaker, Depends(get_async_session_maker)]
-
-
-def check_type_of_files():
-    pass

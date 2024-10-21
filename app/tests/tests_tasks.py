@@ -38,7 +38,7 @@ class TestsForTasks(BaseTestClass):
             "subsection_id": 1,
         }
 
-        video = create_dummy_txt()
+        video = create_dummy_video()
 
         response = await client.post(
             self.get_endpoint("create"),
@@ -49,7 +49,7 @@ class TestsForTasks(BaseTestClass):
         assert response.status_code == 201
         assert (
             response.json().get("video_path")
-            == "media/course_media/course_1/task_1/videos/dummy.txt"
+            == "media/course_media/course_1/task_1/videos/dummy.mp4"
         )
 
         data = {
@@ -80,7 +80,7 @@ class TestsForTasks(BaseTestClass):
             ("task_tests", (f"dummy{i}.txt", create_dummy_txt(f"dummy{i}")))
             for i in range(2)
         ]
-        files = [("video", ("video.txt", video))] + task_tests
+        files = [("video", ("video.mp4", video))] + task_tests
 
         response = await client.post(
             self.get_endpoint("create"), files=files, data=data, headers=self.headers
@@ -91,6 +91,23 @@ class TestsForTasks(BaseTestClass):
             response.json().get("task_tests")[0]["test_file"]
             == "media/course_media/course_1/task_3/tests/dummy0.txt"
         )
+
+    async def test_failed_create_task(self, client: AsyncClient, token: dict):
+        self.headers.update(token)
+        data = {
+            "task_type": json.dumps({"name": "test"}),
+            "text": "This text for test-task 1",
+            "subsection_id": 1,
+        }
+
+        response = await client.post(
+                    self.get_endpoint("create"),
+                    files={"video": create_dummy_txt()},
+                    data=data,
+                    headers=self.headers,
+                )
+
+        assert response.status_code == 400
 
     @pytest.mark.usefixtures("create_task")
     async def test_get_task(self, client: AsyncClient, token: dict):
@@ -120,11 +137,11 @@ class TestsForTasks(BaseTestClass):
             "text": "New text",
             "scores": 10
         }
-        video = create_dummy_txt("new_video.txt")
+        video = create_dummy_video("new_video.mp4")
 
         response = await client.patch(self.get_endpoint(f"patch/{task_id}"),
-            files={"file": video},data=data, headers=self.headers)
+            files={"video": video}, data=data, headers=self.headers)
         res = response.json()
         assert response.status_code == 200
         assert res.get('text') == "New text" and res.get("task_type").get("name") == "code"
-        assert res.get("video_path") == "media/course_media/course_1/task_1/videos/new_video.txt"
+        assert res.get("video_path") == "media/course_media/course_1/task_1/videos/new_video.mp4"
