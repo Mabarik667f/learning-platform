@@ -15,7 +15,7 @@ from core.crud import BaseCrud
 from .shemas import Answer, CreateTask, TaskTest, TaskType, UpdateTask
 from .utils import TaskUtils
 
-from helpers import UploadMediaFile
+from helpers import UploadMediaFile, delete_dir_media
 
 from loguru import logger
 
@@ -67,6 +67,8 @@ class TaskCrud(BaseCrud):
 
     async def delete_task(self, task_id: int) -> None:
         obj = await self.get_task(task_id)
+        course_id = await self.get_task_utils().get_course_id(obj)
+        delete_dir_media(obj.get_upload_path_for_video(course_id))
         await self.session.delete(obj)
         await self.session.commit()
 

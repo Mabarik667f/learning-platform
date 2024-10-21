@@ -10,7 +10,7 @@ from models.categories import Category, CourseHasCategory
 from models.courses import Course as CourseModel
 from categories.utils import get_list_categories
 from collections.abc import Sequence
-from helpers import UploadMediaFile
+from helpers import UploadMediaFile, delete_dir_media
 
 from .utils import CourseUtils
 from .shemas import CourseListQueryParams, CreateCourse, UpdateCourse
@@ -52,6 +52,8 @@ class CourseCrud(BaseCrud):
             await self.session.execute(q)
             await self.session.delete(course_obj)
             await self.session.commit()
+
+        delete_dir_media(course_obj.base_media_path_for_course())
 
     async def patch_course(
         self, course_data: UpdateCourse, course_id: int, img: UploadFile

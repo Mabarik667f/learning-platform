@@ -67,3 +67,6 @@ class TaskUtils(BaseCrud):
         )
         res = await self.session.execute(q)
         return res.scalar_one()
+
+    def delete_task_files_content(self, task_obj: TaskModel) -> None:
+        pass

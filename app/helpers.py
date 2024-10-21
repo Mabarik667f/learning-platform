@@ -15,7 +15,7 @@ from models.courses import (
 )
 
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from shutil import rmtree
 
 class UploadMediaFile:
 
@@ -63,3 +63,7 @@ class UploadMediaFile:
         with open(file_path, "wb") as buf:
             buf.write(await file.read())
         return file_path
+
+
+def delete_dir_media(path: str):
+    rmtree(path)

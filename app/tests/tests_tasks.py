@@ -49,7 +49,7 @@ class TestsForTasks(BaseTestClass):
         assert response.status_code == 201
         assert (
             response.json().get("video_path")
-            == "media/course_media/course_1/course_videos/task_1/dummy.txt"
+            == "media/course_media/course_1/task_1/videos/dummy.txt"
         )
 
         data = {
@@ -89,7 +89,7 @@ class TestsForTasks(BaseTestClass):
         assert len(response.json().get("task_tests")) == 2
         assert (
             response.json().get("task_tests")[0]["test_file"]
-            == "media/course_media/course_1/course_tests/task_3/dummy0.txt"
+            == "media/course_media/course_1/task_3/tests/dummy0.txt"
         )
 
     @pytest.mark.usefixtures("create_task")
@@ -125,7 +125,6 @@ class TestsForTasks(BaseTestClass):
         response = await client.patch(self.get_endpoint(f"patch/{task_id}"),
             files={"file": video},data=data, headers=self.headers)
         res = response.json()
-        logger.info(res)
         assert response.status_code == 200
         assert res.get('text') == "New text" and res.get("task_type").get("name") == "code"
-        assert res.get("video_path") == "media/course_media/course_1/course_videos/task_1/new_video.txt"
+        assert res.get("video_path") == "media/course_media/course_1/task_1/videos/new_video.txt"

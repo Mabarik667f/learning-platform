@@ -41,8 +41,11 @@ class Course(Base):
         back_populates="course", lazy="selectin"
     )
 
+    def base_media_path_for_course(self):
+        return f"{settings.MEDIA_PATH}/course_media/course_{self.id}"
+
     def get_upload_path_for_img(self):
-        return f"{settings.MEDIA_PATH}/course_media/course_{self.id}/course_img/"
+        return f"{self.base_media_path_for_course()}/course_img/"
 
 
 class Section(Base):
@@ -107,7 +110,7 @@ class Task(Base):
     submissions: Mapped[list["Submission"]] = relationship(back_populates="task")
 
     def get_upload_path_for_video(self, course_id: int):
-        return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/course_videos/task_{self.id}/"
+        return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/task_{self.id}/videos/"
 
 class Answer(Base):
     __tablename__ = "answer"
@@ -131,7 +134,7 @@ class TaskTest(Base):
     task: Mapped["Task"] = relationship(back_populates="task_tests")
 
     def get_upload_path_for_test(self, course_id: int):
-        return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/course_tests/task_{self.task_id}/"
+        return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/task_{self.task_id}/tests/"
 
 
 class TaskType(Base):
