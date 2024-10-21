@@ -4,7 +4,7 @@ import pytest
 from httpx import AsyncClient
 
 from .helpers.test_class import BaseTestClass
-from .helpers.dummy_files import create_dummy_img
+from .helpers.dummy_files import create_dummy_img, create_dummy_txt
 
 @pytest.mark.usefixtures("create_user", "create_categories")
 class TestsForCourses(BaseTestClass):
@@ -25,6 +25,11 @@ class TestsForCourses(BaseTestClass):
         response = await client.post(self.get_endpoint("create"), files={"img": img}, data=data, headers=self.headers)
         assert response.status_code == 201
         assert response.json()["img"] == "media/course_media/course_1/course_img/dummy.png"
+
+        response = await client.post(self.get_endpoint("create"),
+            files={"img": create_dummy_txt()}, data=data, headers=self.headers)
+        assert response.status_code == 400
+
 
     @pytest.mark.usefixtures("create_course")
     async def test_patch_course(self, client: AsyncClient, token: dict):

@@ -2,6 +2,7 @@ from fastapi import Depends, File, Query, UploadFile, status
 from fastapi.responses import Response
 from fastapi.routing import APIRouter
 
+from media_helpers import check_content_type
 from categories.utils import get_categories_by_ids
 from categories.shemas import Category
 from users.deps import CurActiveUserDep
@@ -32,6 +33,7 @@ async def create(
     img: UploadFile,
     course: CreateCourse = Depends(CreateCourse.as_form),
 ) -> CourseResponse:
+    check_content_type(["image/jpeg", "image/jpg", "image/png"], img)
     course_obj = await course_crud.create_course(course, img)
     return CourseResponse(**course_obj.to_dict())
 
@@ -44,6 +46,7 @@ async def patch(
     course: UpdateCourse = Depends(UpdateCourse.as_form),
     img: UploadFile = File(None)
 ) -> CourseResponse:
+    check_content_type(["image/jpeg", "image/jpg", "image/png"], img)
     course_obj = await course_crud.patch_course(course, course_id, img)
     return CourseResponse(**course_obj.to_dict())
 
