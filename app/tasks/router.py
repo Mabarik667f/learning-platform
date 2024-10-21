@@ -27,6 +27,8 @@ async def create_task(
     task_for_create: CreateTask = Depends(CreateTask.as_form),
 ):
     check_content_type(["video/mp4"], video)
+    if task_tests:
+        [check_content_type(["text/plain", "text/x-python"], f) for f in task_tests]
     obj = await task_crud.create_task(task_for_create, video, task_tests)
     return generate_task_response(obj, task_for_create.task_type.name)
 
