@@ -1,12 +1,12 @@
 import fetchApiV1 from "@/api";
 import { ref } from "vue";
-import { Course } from "../interfaces";
+import { CourseResponse } from "../interfaces";
 
 export default async function getCourseList(
   queryParams?: string,
   offset?: number,
   limit?: number,
-): Promise<Array<Course>> {
+): Promise<Array<CourseResponse>> {
   const options = {
     method: "GET",
     headers: {

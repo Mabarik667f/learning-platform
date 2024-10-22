@@ -4,8 +4,8 @@ import { Course } from "./interfaces";
 import getCourseList from "./api/getCourseList";
 
 export const useCourseStore = defineStore("course", () => {
-  const courses = ref<Array<Course>>([]);
-  const defaultCourses = ref<Array<Course>>([]);
+  const courses = ref<Course[]>([]);
+  const defaultCourses = ref<Course[]>([]);
 
   const courseSearchQuery = ref<string>("");
 

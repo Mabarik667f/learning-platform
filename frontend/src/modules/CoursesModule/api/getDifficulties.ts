@@ -1,5 +1,5 @@
 import fetchApiV1 from "@/api";
-import { FilterOption } from "@/modules/FiltersModule/interfaces/FilterOption";
+import { FilterOption } from "@/modules/FiltersModule/interfaces";
 
 export default async function getDifficulties(): Promise<FilterOption[]> {
   const options = {

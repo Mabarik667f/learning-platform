@@ -8,7 +8,6 @@ import {
     computed,
 } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { getCategories } from "@/modules/CategoriesModule";
 import { getDifficulties } from "@modules/CoursesModule";
 import { getQueryParams, updateRouteQueryParams } from "../helpers/queryParams";
 import { FilterOption, Prices } from "../interfaces";
