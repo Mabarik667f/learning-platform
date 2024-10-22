@@ -1,4 +1,3 @@
-export interface Category {
-  title: string;
-  id: number;
-}
+import { BaseModel } from "@/interfaces/objectsInterfaces";
+
+export interface Category extends BaseModel {}
