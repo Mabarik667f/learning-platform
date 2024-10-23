@@ -56,43 +56,78 @@ export default defineComponent({
         </template>
         <template v-slot:fields>
             <div class="mb-3">
-                <c-input v-model="course.title" />
+                <cf-label :for="'title'">Название</cf-label>
+                <c-input v-model="course.title" :id="'title'" />
             </div>
             <div class="mb-3">
-                <c-input v-model="course.price" :type="'number'" />
+                <cf-label :for="'price'">Цена</cf-label>
+                <c-input
+                    v-model="course.price"
+                    :type="'number'"
+                    :id="'price'"
+                />
             </div>
             <div class="mb-3">
-                <c-file @change="handleImageChange" />
+                <cf-label :for="'img'">Изображение</cf-label>
+                <c-file @change="handleImageChange" :id="'img'" />
             </div>
             <div class="mb-3">
-                <c-text v-model="course.describe" />
+                <cf-label :for="'difficulty'">Сложность</cf-label>
+                <c-select
+                    v-model="course.difficulty"
+                    :options="difficulties"
+                    :id="'difficulty'"
+                    class="form-select"
+                />
             </div>
             <div class="mb-3">
-                <c-select v-model="course.difficulty" :options="difficulties" />
-            </div>
-            <div class="mb-3">
+                <cf-label :for="'cats'">Категории</cf-label>
                 <Multiselect
                     v-model="course.categories"
                     :options="categories"
                     mode="multiple"
+                    class="fm-select"
+                    :id="'cats'"
                 />
             </div>
-            <!-- select difficulty, select categories-->
+            <div class="mb-3">
+                <cf-label :for="'describe'">Описание</cf-label>
+                <c-text v-model="course.describe" :id="'describe'" />
+            </div>
         </template>
         <template v-slot:footer>
-            <c-button>Создать</c-button>
+            <c-button class="create-btn">Создать</c-button>
         </template>
     </c-form>
 </template>
 
 <style scoped>
-* {
-    background: blue;
+h2 {
+    margin-bottom: 20px;
 }
 .create-form {
+    color: #fff;
+    backdrop-filter: blur(20px);
     padding: 30px 40px;
     border-radius: 20px;
-    max-width: 600px;
+    width: 500px;
+    max-width: 500px;
     height: 100%;
+}
+.create-btn {
+    width: 200px !important;
+    margin-top: 20px;
+}
+
+.fm-select,
+.form-select {
+    border-radius: 40px;
+    height: 40px;
+    cursor: pointer;
+    color: black;
+}
+
+#describe {
+    max-height: 400px !important;
 }
 </style>

@@ -36,8 +36,15 @@ export default defineComponent({
 
 <style scroped>
 textarea {
-    border: 1px solid black;
-    border-radius: 8px;
+    width: 100%;
     resize: none;
+    background: transparent;
+    color: inherit;
+    border: none;
+    outline: none;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    color: inherit;
+    padding: 10px 30px 10px 20px;
 }
 </style>

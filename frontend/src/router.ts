@@ -2,6 +2,7 @@ import HomeView from "@/views/HomeView/HomeView.vue";
 import RegisterView from "@/views/RegisterView/RegisterView.vue";
 import LoginView from "@/views/LoginView/LoginView.vue";
 import VerifyCodeView from "@/views/VerifyCodeView/VerifyCodeView.vue";
+import CreateCourseView from "@/views/CreateCourseView/CreateCourseView.vue";
 import { RouteLocationNormalized } from "vue-router";
 import Cookies from "js-cookie";
 
@@ -57,6 +58,7 @@ const routes: Array<RouteRecordRaw> = [
     name: "home",
     component: HomeView,
     props: {},
+    // beforeEnter: authGuard,
   },
   {
     path: "/register",
@@ -75,6 +77,12 @@ const routes: Array<RouteRecordRaw> = [
     name: "verify-code",
     component: VerifyCodeView,
     beforeEnter: userAuth,
+  },
+  {
+    path: "/create-course",
+    name: "create-course",
+    component: CreateCourseView,
+    // beforeEnter: authGuard,
   },
 ];
 
