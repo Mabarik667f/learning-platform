@@ -162,3 +162,7 @@ cython_debug/
 .venv
 pyrightconfig.json
 debugger.*
+app/tests/media
+app/tests/logging
+app/media/course_media/
+app/media/user_media/

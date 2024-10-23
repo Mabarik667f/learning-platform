@@ -1,15 +1,15 @@
 <script lang="ts">
 import { defineComponent, PropType, ref, watch, onMounted } from "vue";
-import { Course } from "../interfaces";
+import { CourseResponse } from "../interfaces";
 export default defineComponent({
     props: {
         course: {
-            type: Object as PropType<Course>,
+            type: Object as PropType<CourseResponse>,
             require: true,
         },
     },
     setup(props) {
-        const course = ref<Course>();
+        const course = ref<CourseResponse>();
         onMounted(() => (course.value = props.course));
         watch(
             () => props.course,

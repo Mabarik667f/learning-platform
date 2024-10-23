@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.orm.properties import ForeignKey
 from sqlalchemy.sql.sqltypes import Text
 from core.db import Base, pk
+from core.config import settings
 from datetime import datetime
 
 if TYPE_CHECKING:
@@ -40,6 +41,12 @@ class Course(Base):
         back_populates="course", lazy="selectin"
     )
 
+    def base_media_path_for_course(self):
+        return f"{settings.MEDIA_PATH}/course_media/course_{self.id}"
+
+    def get_upload_path_for_img(self):
+        return f"{self.base_media_path_for_course()}/course_img/"
+
 
 class Section(Base):
     __tablename__ = "section"
@@ -54,7 +61,7 @@ class Section(Base):
 
     course: Mapped["Course"] = relationship(back_populates="sections")
     subsections: Mapped[List["Subsection"]] = relationship(
-        back_populates="section", lazy="selectin"
+        back_populates="section", lazy="selectin", cascade="all, delete", passive_deletes=True
     )
 
 
@@ -71,7 +78,8 @@ class Subsection(Base):
     )
 
     section: Mapped["Section"] = relationship(back_populates="subsections")
-    tasks: Mapped[List["Task"]] = relationship(back_populates="subsection")
+    tasks: Mapped[List["Task"]] = relationship(back_populates="subsection",
+        cascade="all, delete", passive_deletes=True)
 
 
 class Task(Base):
@@ -81,7 +89,6 @@ class Task(Base):
     text: Mapped[str | None] = mapped_column(Text, nullable=False)
     video_path: Mapped[str] = mapped_column(String, nullable=True)
 
-    todo: Mapped[bool] = mapped_column(default=False)
     scores: Mapped[int] = mapped_column(CheckConstraint("scores > 0"), nullable=False)
 
     task_type_id: Mapped[int] = mapped_column(
@@ -95,13 +102,15 @@ class Task(Base):
     task_type: Mapped["TaskType"] = relationship(back_populates="tasks")
 
     answers: Mapped[list["Answer"]] = relationship(
-        back_populates="task", lazy="selectin"
+        back_populates="task", lazy="selectin", cascade="all, delete", passive_deletes=True
     )
     task_tests: Mapped[list["TaskTest"]] = relationship(
-        back_populates="task", lazy="selectin"
+        back_populates="task", lazy="selectin", passive_deletes=True, cascade="all, delete"
     )
     submissions: Mapped[list["Submission"]] = relationship(back_populates="task")
 
+    def get_upload_path_for_video(self, course_id: int):
+        return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/task_{self.id}/videos/"
 
 class Answer(Base):
     __tablename__ = "answer"
@@ -118,11 +127,14 @@ class TaskTest(Base):
     __tablename__ = "task_test"
 
     id: Mapped[pk]
-    test_file: Mapped[str] = mapped_column(Text)
+    test_file: Mapped[str] = mapped_column(String, nullable=False)
 
     task_id: Mapped[int] = mapped_column(ForeignKey("task.id", ondelete="CASCADE"))
 
     task: Mapped["Task"] = relationship(back_populates="task_tests")
+
+    def get_upload_path_for_test(self, course_id: int):
+        return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/task_{self.task_id}/tests/"
 
 
 class TaskType(Base):
@@ -142,6 +154,7 @@ class Submission(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("user_account.id", ondelete="CASCADE")
     )
+    todo: Mapped[bool] = mapped_column(default=False)
 
     submission_date: Mapped[str] = mapped_column(DateTime, default=datetime.utcnow)
     submission_code: Mapped[str] = mapped_column(Text)

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
+    "@vueform/multiselect": "^2.6.10",
     "bootstrap": "^5.3.3",
     "dotenv": "^16.4.5",
     "js-cookie": "^3.0.5",

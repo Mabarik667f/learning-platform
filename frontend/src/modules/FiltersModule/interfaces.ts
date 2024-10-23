@@ -1,7 +1,6 @@
-export interface FilterOption {
-  title: string;
-  id?: number;
-}
+import { BaseModel } from "@/interfaces/objectsInterfaces";
+
+export interface FilterOption extends BaseModel {}
 
 export interface Prices {
   min_price: number | string;

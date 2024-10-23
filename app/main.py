@@ -8,7 +8,7 @@ from fastapi import Request
 from starlette.routing import Match
 
 from core.exceptions import CoreValidationError
-from routers import api_router
+from api import api_router
 from core.config import settings
 from loguru import logger
 
@@ -36,7 +36,7 @@ logger.add(
 app = FastAPI()
 
 app.include_router(api_router)
-app.mount("/media", StaticFiles(directory="media"), name="media")
+# app.mount("/media", StaticFiles(directory="media"), name="media")
 
 if settings.BACKEND_CORS:
     app.add_middleware(
