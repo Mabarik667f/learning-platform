@@ -6,8 +6,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from httpx import AsyncClient
 from loguru import logger
 
-from tasks.utils import TaskUtils
-from tasks.shemas import TaskType
+from utils.tasks import TaskUtils
+from shemas.tasks import TaskType
 from .helpers.test_class import BaseTestClass
 from .helpers.dummy_files import create_dummy_img, create_dummy_txt, create_dummy_video
 

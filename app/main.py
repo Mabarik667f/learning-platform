@@ -1,7 +1,6 @@
-import pathlib
 import sys
 
-from fastapi import FastAPI, UploadFile, status
+from fastapi import FastAPI, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
@@ -9,7 +8,7 @@ from fastapi import Request
 from starlette.routing import Match
 
 from core.exceptions import CoreValidationError
-from routers import api_router
+from api import api_router
 from core.config import settings
 from loguru import logger
 

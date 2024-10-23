@@ -1,12 +1,15 @@
 from typing import Any, Annotated
 from collections.abc import AsyncGenerator
-from fastapi import UploadFile
-from fastapi.params import Depends
+from fastapi import Depends, Query, UploadFile
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-from .db import async_engine
 
-from models import *
+from .db import async_engine
+from models.courses import *
+from models.categories import *
+from models.users import *
+
+from loguru import logger
 
 AsyncSessionMaker = async_sessionmaker(
     async_engine, class_=AsyncSession, expire_on_commit=False
