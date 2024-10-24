@@ -1,24 +1,15 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import { CreateCourseForm } from "@/modules/CoursesModule";
+import { CreateStructForm } from "@/modules/CreateCourseStructModule";
 export default defineComponent({
     components: {
-        CreateCourseForm,
+        CreateStructForm,
     },
 });
 </script>
-
 <template>
     <div class="con">
         <CreateCourseForm />
     </div>
 </template>
-
-<style scoped>
-.con {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-}
-</style>
+<style scoped></style>

@@ -47,7 +47,7 @@ export default defineComponent({
 
 <template>
     <c-form
-        method="post"
+        :method="'post'"
         @submit.prevent="handleCreateCourse"
         class="create-form"
     >

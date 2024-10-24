@@ -3,6 +3,7 @@ import RegisterView from "@/views/RegisterView/RegisterView.vue";
 import LoginView from "@/views/LoginView/LoginView.vue";
 import VerifyCodeView from "@/views/VerifyCodeView/VerifyCodeView.vue";
 import CreateCourseView from "@/views/CreateCourseView/CreateCourseView.vue";
+import CreateStructView from "@/views/CreateStructView/CreateStructView.vue";
 import { RouteLocationNormalized } from "vue-router";
 import Cookies from "js-cookie";
 
@@ -83,6 +84,13 @@ const routes: Array<RouteRecordRaw> = [
     name: "create-course",
     component: CreateCourseView,
     // beforeEnter: authGuard,
+  },
+  {
+    // course_id
+    path: "/create-struct",
+    name: "create-struct",
+    component: CreateStructView,
+    // beforeEnter: authGuard
   },
 ];
 
