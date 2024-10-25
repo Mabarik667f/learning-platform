@@ -57,7 +57,7 @@ export default defineComponent({
         <template v-slot:fields>
             <div class="mb-3">
                 <cf-label :for="'title'">Название</cf-label>
-                <c-input v-model="course.title" :id="'title'" />
+                <c-input v-model="course.title" :id="'title'" required />
             </div>
             <div class="mb-3">
                 <cf-label :for="'price'">Цена</cf-label>
@@ -65,11 +65,12 @@ export default defineComponent({
                     v-model="course.price"
                     :type="'number'"
                     :id="'price'"
+                    required
                 />
             </div>
             <div class="mb-3">
                 <cf-label :for="'img'">Изображение</cf-label>
-                <c-file @change="handleImageChange" :id="'img'" />
+                <c-file @change="handleImageChange" :id="'img'" required />
             </div>
             <div class="mb-3">
                 <cf-label :for="'difficulty'">Сложность</cf-label>
@@ -78,6 +79,7 @@ export default defineComponent({
                     :options="difficulties"
                     :id="'difficulty'"
                     class="form-select"
+                    required
                 />
             </div>
             <div class="mb-3">
@@ -88,6 +90,7 @@ export default defineComponent({
                     mode="multiple"
                     class="fm-select"
                     :id="'cats'"
+                    required
                 />
             </div>
             <div class="mb-3">

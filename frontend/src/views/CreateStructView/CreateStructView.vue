@@ -9,7 +9,7 @@ export default defineComponent({
 </script>
 <template>
     <div class="con">
-        <CreateCourseForm />
+        <CreateStructForm />
     </div>
 </template>
 <style scoped></style>

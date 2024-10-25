@@ -1,5 +1,5 @@
-import { Section } from "@/modules/SectionModule";
+import { SectionCreate } from "@/modules/SectionModule";
 
 export interface CourseStruct {
-  sections: Section[];
+  sections: SectionCreate[];
 }

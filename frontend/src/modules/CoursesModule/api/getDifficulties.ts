@@ -21,7 +21,7 @@ export default async function getDifficulties(): Promise<FilterOption[]> {
     }));
     return res;
   } catch (error) {
-    return [];
     console.log(error);
+    return [];
   }
 }
