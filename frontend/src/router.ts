@@ -86,11 +86,26 @@ const routes: Array<RouteRecordRaw> = [
     // beforeEnter: authGuard,
   },
   {
-    // course_id
-    path: "/create-struct",
-    name: "create-struct",
+    path: "/struct/:id",
+    name: "struct",
     component: CreateStructView,
+    beforeEnter: (
+      to: RouteLocationNormalized,
+      from: RouteLocationNormalized,
+      next: Function,
+    ) => {
+      //if (from.name === "create-course" && to.params.id) {
+      if (to.params.id) {
+        next();
+      } else {
+        next("/create-course");
+      }
+    },
     // beforeEnter: authGuard
+  },
+  {
+    path: "/:pathMatch(.*)",
+    redirect: "/",
   },
 ];
 

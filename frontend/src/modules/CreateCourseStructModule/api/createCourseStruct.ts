@@ -6,15 +6,17 @@ export default async function createCourseStruct(
   struct: CourseStruct,
   courseId: number,
 ) {
+  const payload = {
+    sections: struct.sections,
+  };
+
   const options = {
     method: "POST",
     headers: {
       "Content-type": "application/json",
       Authorization: `Bearer ${Cookies.get("access")}`,
     },
-    body: {
-      sections: struct.sections,
-    },
+    body: JSON.stringify(payload),
   };
   const response: Response = await fetchApiV1(
     `courses/struct/${courseId}`,

@@ -10,32 +10,12 @@ export default defineComponent({
         id: {
             type: String as PropType<string>,
         },
-        modelValue: {
-            required: true,
-            default: "",
-            type: [String, Number, Boolean] as PropType<
-                string | number | boolean
-            >,
-        },
     },
-    emits: ["update:modelValue"],
 });
 </script>
 
 <template>
-    <input
-        type="file"
-        :value="modelValue"
-        :id="id"
-        :placeholder="placeholder"
-        class="inp"
-        @input="
-            $emit(
-                'update:modelValue',
-                ($event.target as HTMLInputElement).value,
-            )
-        "
-    />
+    <input type="file" :id="id" :placeholder="placeholder" class="inp" />
 </template>
 
 <style scroped>

@@ -1,9 +1,11 @@
 import fetchApiV1 from "@/api";
-import { CourseCreate } from "../interfaces";
+import { CourseCreate, CourseResponse } from "../interfaces";
 import Cookies from "js-cookie";
 import convertToFormData from "@/helpers/convertToFormData";
 
-export default async function createCourse(course: CourseCreate) {
+export default async function createCourse(
+  course: CourseCreate,
+): Promise<CourseResponse> {
   const formData = convertToFormData(course);
   const options = {
     method: "POST",
@@ -16,7 +18,8 @@ export default async function createCourse(course: CourseCreate) {
 
   const data = await response.json();
   if (response.ok) {
-    console.log("SUCCESS");
+    return data;
+  } else {
+    throw new Error(data.detail);
   }
-  console.log(data);
 }

@@ -1,6 +1,7 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted } from "vue";
-import { CourseCreate } from "../interfaces";
+import { useRouter } from "vue-router";
+import { CourseCreate, CourseResponse } from "../interfaces";
 import { Difficulty, MultiselectOption } from "@/interfaces/objectsInterfaces";
 import Multiselect from "@vueform/multiselect";
 import createCourse from "../api/createCourse";
@@ -11,6 +12,7 @@ export default defineComponent({
         Multiselect,
     },
     setup() {
+        const router = useRouter();
         const course = ref<CourseCreate>({
             title: "",
             describe: "",
@@ -20,7 +22,8 @@ export default defineComponent({
             categories: [],
         });
         const handleCreateCourse = async () => {
-            await createCourse(course.value);
+            const courseObj: CourseResponse = await createCourse(course.value);
+            router.push({ name: "struct", params: { id: courseObj.id } });
         };
 
         const difficulties = ref<Difficulty[]>([]);

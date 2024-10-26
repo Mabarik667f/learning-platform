@@ -21,8 +21,8 @@ export default defineComponent({
 </script>
 <template>
     <div>
-        <c-input v-model="sec.describe" required />
         <c-input v-model="sec.title" required />
+        <c-input v-model="sec.describe" />
         <c-button
             :type="'button'"
             @click="structObj.addSubSection(sec.position - 1)"

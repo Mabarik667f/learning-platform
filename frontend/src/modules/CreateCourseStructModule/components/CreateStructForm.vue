@@ -1,21 +1,27 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
+import createCourseStruct from "../api/createCourseStruct";
 import CreateStructBtn from "./CreateStructBtn.vue";
 import CreateCourseStruct from "../helpers/courseStruct";
 import { NewSectionFields } from "@/modules/SectionModule";
+import { useRoute } from "vue-router";
 export default defineComponent({
     components: {
         CreateStructBtn,
         NewSectionFields,
     },
     setup() {
+        const route = useRoute();
+        const courseId = ref<number>(parseInt(route.params.id as string));
         const structObj = new CreateCourseStruct();
 
-        const handleSubmit = async () => {
-            console.log(1);
-        };
         const struct = structObj.struct;
-        return { struct, structObj, handleSubmit };
+        const handleSubmit = async () => {
+            if (struct.value) {
+                await createCourseStruct(struct.value, courseId.value);
+            }
+        };
+        return { struct, structObj, handleSubmit, courseId };
     },
 });
 </script>

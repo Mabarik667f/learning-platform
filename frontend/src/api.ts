@@ -19,7 +19,7 @@ export default async function fetchApiV1(
   },
 ): Promise<Response> {
   try {
-    const response = await fetch(`v1/${endpoint}`, {
+    const response = await fetch(`/v1/${endpoint}`, {
       method: options.method,
       headers: {
         ...options.headers,
@@ -29,7 +29,7 @@ export default async function fetchApiV1(
 
     if (response.status === 401) {
       await refresh_token();
-      const response = await fetch(`v1/${endpoint}`, {
+      const response = await fetch(`/v1/${endpoint}`, {
         method: options.method,
         headers: {
           ...options.headers,
@@ -53,7 +53,7 @@ async function refresh_token() {
     access_token: "",
   });
 
-  const response = await fetch("v1/auth/token/refresh", {
+  const response = await fetch("/v1/auth/token/refresh", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
