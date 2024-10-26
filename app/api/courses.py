@@ -30,7 +30,7 @@ router = APIRouter(tags=["courses"], prefix="/courses")
 @router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create(
     course_crud: CourseCrudDep,
-    current_user: CurActiveUserDep,
+    # current_user: CurActiveUserDep,
     img: UploadFile,
     course: CreateCourse = Depends(CreateCourse.as_form),
 ) -> CourseResponse:
@@ -121,7 +121,7 @@ async def add_categories(
 async def create_course_struct(
     session: SessionDep,
     sessionmaker: AsyncSessionMakerDep,
-    current_user: CurActiveUserDep,
+    # current_user: CurActiveUserDep,
     course_id: int,
     struct: CreateCourseStruct,
 ):
