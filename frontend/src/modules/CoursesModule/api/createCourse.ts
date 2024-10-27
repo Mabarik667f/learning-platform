@@ -7,6 +7,8 @@ export default async function createCourse(
   course: CourseCreate,
 ): Promise<CourseResponse> {
   const formData = convertToFormData(course);
+  // @ts-ignore
+  formData.set("categories", course.categories);
   const options = {
     method: "POST",
     headers: {

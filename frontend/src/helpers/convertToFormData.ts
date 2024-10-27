@@ -3,8 +3,7 @@ export default function (obj: Object): FormData {
   for (const [key, val] of Object.entries(obj)) {
     if (
       (val instanceof Array || val instanceof Object) &&
-      !(val instanceof File || val instanceof Blob) &&
-      key !== "categories"
+      !(val instanceof File || val instanceof Blob)
     ) {
       formData.append(key, JSON.stringify(val));
     } else {
