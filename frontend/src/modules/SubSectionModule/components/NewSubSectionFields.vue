@@ -23,12 +23,13 @@ export default defineComponent({
 </script>
 <template>
     <div>
-        <c-input v-model="sub.title" required />
-        <c-button
-            :type="'button'"
+        <div class="mb-3">
+            <cf-label :for="sub.position">Название</cf-label>
+            <c-input v-model="sub.title" required :id="sub.position" />
+        </div>
+        <del-btn
             @click="structObj.delSubSection(sec.position - 1, sub.position - 1)"
-            >Удалить</c-button
-        >
+        />
     </div>
 </template>
 <style scoped></style>

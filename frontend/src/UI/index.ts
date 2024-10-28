@@ -5,5 +5,15 @@ import CFormLabel from "@/UI/CFormLabel.vue";
 import CText from "@/UI/CText.vue";
 import CSelect from "@/UI/CSelect.vue";
 import CFile from "@/UI/CFile.vue";
+import DeleteBtn from "@/UI/DeleteBtn.vue";
 
-export default [CForm, CInput, CButton, CFormLabel, CText, CSelect, CFile];
+export default [
+  CForm,
+  CInput,
+  CButton,
+  CFormLabel,
+  CText,
+  CSelect,
+  CFile,
+  DeleteBtn,
+];

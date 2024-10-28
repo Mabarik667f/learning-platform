@@ -7,4 +7,8 @@ export default defineComponent({
 <template>
     <c-button>Создать</c-button>
 </template>
-<style scoped></style>
+<style scoped>
+button {
+    margin-top: 15px;
+}
+</style>
