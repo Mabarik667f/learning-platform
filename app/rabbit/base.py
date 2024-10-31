@@ -3,12 +3,10 @@ from aio_pika import connect_robust
 from .exc import RabbitException
 from core.config import settings
 
+
 class RabbitBase:
 
-    def __init__(
-        self,
-        url: str = settings.RABBIT_URI
-    ) -> None:
+    def __init__(self, url: str = settings.RABBIT_URI) -> None:
         self.url = url
         self._channel: AbstractChannel | None = None
         self._connection: AbstractRobustConnection | None = None
@@ -30,5 +28,8 @@ class RabbitBase:
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         if isinstance(self._channel, AbstractChannel) and not self._channel.is_closed:
             await self._channel.close()
-        if isinstance(self._connection, AbstractRobustConnection) and not self._connection.is_closed:
+        if (
+            isinstance(self._connection, AbstractRobustConnection)
+            and not self._connection.is_closed
+        ):
             await self._connection.close()

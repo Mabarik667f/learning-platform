@@ -11,21 +11,16 @@ class NewSubmissionsRabbitMixin:
     channel: "AbstractChannel"
 
     async def declare_queue_for_new_tasks(
-        self,
-        queue_name: str = "",
-        exclusive: bool = False
+        self, queue_name: str = "", exclusive: bool = False
     ) -> AbstractQueue:
-        queue = await self.channel.declare_queue(
-            name=queue_name,
-            exclusive=exclusive
-        )
+        queue = await self.channel.declare_queue(name=queue_name, exclusive=exclusive)
         return queue
 
     async def consume_messages(
         self,
         message_callback: Callable[[AbstractIncomingMessage], Awaitable[Any]],
         queue_name: str = "",
-        prefetch_count: int = 1
+        prefetch_count: int = 1,
     ):
         await self.channel.set_qos(prefetch_count=prefetch_count)
         queue = await self.declare_queue_for_new_tasks(queue_name=queue_name)
@@ -33,5 +28,5 @@ class NewSubmissionsRabbitMixin:
         await asyncio.Future()
 
 
-class NewSubmissionsRabbit(NewSubmissionsRabbitMixin, RabbitBase): #type: ignore
+class NewSubmissionsRabbit(NewSubmissionsRabbitMixin, RabbitBase):  # type: ignore
     pass

@@ -2,21 +2,19 @@ import asyncio
 
 import aio_pika
 
-from .get_connection import get_connection
+from core.config import settings
+from rabbit.base import RabbitBase
 from loguru import logger
 
+
 async def pub_m() -> None:
-    connection = await get_connection()
+    async with RabbitBase() as rb:
+        routing_key = settings.RQ_SUBMISSIONS_QUEUE
 
-    async with connection:
-        routing_key = "task_queue"
-
-        channel = await connection.channel()
         for i in range(5):
-            await channel.default_exchange.publish(
+            await rb.channel.default_exchange.publish(
                 aio_pika.Message(
-                    body=f"Hello {routing_key} {i}".encode(),
-                    headers={"user_id": i}
+                    body=f"Hello {routing_key} {i}".encode(), headers={"user_id": i}
                 ),
                 routing_key=routing_key,
             )

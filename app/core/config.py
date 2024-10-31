@@ -54,6 +54,10 @@ class Settings(BaseSettings):
             host=self.REDIS_HOST, port=self.REDIS_PORT, decode_responses=True
         )
 
+    @property
+    def RABBIT_URI(self):
+        return f"amqp://{self.RABBITMQ_USER}:{self.RABBITMQ_PASSWORD}@{self.RABBITMQ_HOST}:{self.RABBITMQ_PORT}"
+
     MEDIA_PATH: str = "media/"
 
     REDIS_PORT: int = 6379
@@ -63,6 +67,7 @@ class Settings(BaseSettings):
     RABBITMQ_USER: str
     RABBITMQ_PORT: int = 5672
     RABBITMQ_HOST: str = "localhost"
+    RQ_SUBMISSIONS_QUEUE: str = "submissions_queue"
 
     SUPERUSER_USERNAME: str
     SUPERUSER_EMAIL: str
