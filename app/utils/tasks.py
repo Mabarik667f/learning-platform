@@ -13,7 +13,7 @@ from models.courses import (
     Subsection as SubsectionModel,
 )
 from shemas.tasks import Answer, TaskType, TaskTest
-
+from loguru import logger
 
 class TaskUtils(BaseCrud):
 
@@ -36,7 +36,11 @@ class TaskUtils(BaseCrud):
 
     async def create_answers(self, answers: list[Answer], task: TaskModel) -> None:
         for ans in answers:
-            ans_obj = AnswerModel(**ans.dict(), task_id=task.id)
+            ans_obj = AnswerModel(
+                text=ans.text.lower(),
+                is_correct=ans.is_correct,
+                task_id=task.id
+            )
             self.session.add(ans_obj)
             task.answers.append(ans_obj)
 
@@ -67,6 +71,3 @@ class TaskUtils(BaseCrud):
         )
         res = await self.session.execute(q)
         return res.scalar_one()
-
-    def delete_task_files_content(self, task_obj: TaskModel) -> None:
-        pass

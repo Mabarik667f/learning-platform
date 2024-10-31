@@ -51,7 +51,7 @@ async def create_subsection(client: AsyncClient, create_section, token: dict):
 async def create_task(client: AsyncClient, create_subsection, token: dict):
 
     data = {
-        "task_type": json.dumps({"name": "test"}),
+        "task_type": "test",
         "text": "This text for test-task 2",
         "subsection_id": 1,
         "answers": [

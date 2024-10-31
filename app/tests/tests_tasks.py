@@ -33,7 +33,7 @@ class TestsForTasks(BaseTestClass):
         self.headers.update(token)
 
         data = {
-            "task_type": json.dumps({"name": "test"}),
+            "task_type": "test",
             "text": "This text for test-task 1",
             "subsection_id": 1,
         }
@@ -53,7 +53,7 @@ class TestsForTasks(BaseTestClass):
         )
 
         data = {
-            "task_type": json.dumps({"name": "test"}),
+            "task_type": "test",
             "text": "This text for test-task 2",
             "subsection_id": 1,
             "answers": [
@@ -68,11 +68,12 @@ class TestsForTasks(BaseTestClass):
             data=data,
             headers=self.headers,
         )
+
         assert response.status_code == 201
         assert len(response.json().get("answers")) == 2
 
         data = {
-            "task_type": json.dumps({"name": "test"}),
+            "task_type": "test",
             "text": "This text for test-task 2",
             "subsection_id": 1,
         }
@@ -95,7 +96,7 @@ class TestsForTasks(BaseTestClass):
     async def test_failed_create_task(self, client: AsyncClient, token: dict):
         self.headers.update(token)
         data = {
-            "task_type": json.dumps({"name": "test"}),
+            "task_type": "test",
             "text": "This text for test-task 1",
             "subsection_id": 1,
         }
