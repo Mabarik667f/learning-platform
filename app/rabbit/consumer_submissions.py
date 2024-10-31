@@ -15,7 +15,8 @@ async def process_message(message: AbstractIncomingMessage) -> None:
             logger.info(message.body)
 
 
-async def main() -> None:
+async def run_submissions_consumer() -> None:
+    logger.info("Start Consumer")
     async with NewSubmissionsRabbit() as rb:
         await rb.consume_messages(
             process_message, settings.RQ_SUBMISSIONS_QUEUE, prefetch_count=10
@@ -24,6 +25,6 @@ async def main() -> None:
 
 if __name__ == "__main__":
     try:
-        asyncio.run(main())
+        asyncio.run(run_submissions_consumer())
     except KeyboardInterrupt:
         logger.info("CLOSE")

@@ -33,7 +33,10 @@ class SendResultToUserRabbitMixin:
         exchange = await self.declare_users_exchange()
         res_queue = await self.declare_user_res_queue(msg, exchange)
         await exchange.publish(
-            Message(body=f"Result".encode()),
+            Message(body=f"Result".encode(),
+                headers={"user_id": msg.headers.get("user_id"),
+                    "submission_id": int(msg.body)}
+            ),
             routing_key=res_queue.name,
         )
 
