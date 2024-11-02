@@ -99,7 +99,7 @@ class Task(Base):
     )
 
     subsection: Mapped["Subsection"] = relationship(back_populates="tasks")
-    task_type: Mapped["TaskType"] = relationship(back_populates="tasks")
+    task_type: Mapped["TaskType"] = relationship(back_populates="tasks", lazy="selectin")
 
     answers: Mapped[list["Answer"]] = relationship(
         back_populates="task", lazy="selectin", cascade="all, delete", passive_deletes=True
@@ -143,7 +143,7 @@ class TaskType(Base):
     id: Mapped[pk]
     name: Mapped[str] = mapped_column(unique=True)
 
-    tasks: Mapped[list["Task"]] = relationship(back_populates="task_type")
+    tasks: Mapped[list["Task"]] = relationship(back_populates="task_type", lazy="joined")
 
 
 class Submission(Base):

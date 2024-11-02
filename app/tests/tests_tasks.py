@@ -56,26 +56,6 @@ class TestsForTasks(BaseTestClass):
             "task_type": "test",
             "text": "This text for test-task 2",
             "subsection_id": 1,
-            "answers": [
-                json.dumps({"text": "first", "is_correct": False}),
-                json.dumps({"text": "second", "is_correct": True}),
-            ],
-        }
-
-        response = await client.post(
-            self.get_endpoint("create"),
-            files={"video": video},
-            data=data,
-            headers=self.headers,
-        )
-
-        assert response.status_code == 201
-        assert len(response.json().get("answers")) == 2
-
-        data = {
-            "task_type": "test",
-            "text": "This text for test-task 2",
-            "subsection_id": 1,
         }
         task_tests = [
             ("task_tests", (f"dummy{i}.txt", create_dummy_txt(f"dummy{i}")))
@@ -90,7 +70,7 @@ class TestsForTasks(BaseTestClass):
         assert len(response.json().get("task_tests")) == 2
         assert (
             response.json().get("task_tests")[0]["test_file"]
-            == "media/course_media/course_1/task_3/tests/dummy0.txt"
+            == "media/course_media/course_1/task_2/tests/dummy0.txt"
         )
 
     async def test_failed_create_task(self, client: AsyncClient, token: dict):
@@ -102,15 +82,33 @@ class TestsForTasks(BaseTestClass):
         }
 
         response = await client.post(
-                    self.get_endpoint("create"),
-                    files={"video": create_dummy_txt()},
-                    data=data,
-                    headers=self.headers,
-                )
+            self.get_endpoint("create"),
+            files={"video": create_dummy_txt()},
+            data=data,
+            headers=self.headers,
+        )
 
         assert response.status_code == 400
 
     @pytest.mark.usefixtures("create_task")
+    async def test_create_answers_for_task(self, client: AsyncClient, token: dict):
+        self.headers.update(token)
+
+        answers = [
+                {"text": "first", "is_correct": False},
+                {"text": "second", "is_correct": True},
+            ]
+
+        task_id = 1
+        response = await client.post(
+            self.get_endpoint(f"add-answers/{task_id}"),
+            json=answers,
+            headers=self.headers,
+        )
+        assert response.status_code == 201
+        assert len(response.json().get('answers')) == 2
+
+    @pytest.mark.usefixtures("create_task", "create_answers_for_task")
     async def test_get_task(self, client: AsyncClient, token: dict):
         self.headers.update(token)
 
@@ -125,7 +123,9 @@ class TestsForTasks(BaseTestClass):
         self.headers.update(token)
 
         task_id = 1
-        response = await client.delete(self.get_endpoint(f'delete/{task_id}'), headers=self.headers)
+        response = await client.delete(
+            self.get_endpoint(f"delete/{task_id}"), headers=self.headers
+        )
         assert response.status_code == 204
 
     @pytest.mark.usefixtures("create_task")
@@ -136,13 +136,22 @@ class TestsForTasks(BaseTestClass):
         data = {
             "task_type": json.dumps({"name": "code"}),
             "text": "New text",
-            "scores": 10
+            "scores": 10,
         }
         video = create_dummy_video("new_video.mp4")
 
-        response = await client.patch(self.get_endpoint(f"patch/{task_id}"),
-            files={"video": video}, data=data, headers=self.headers)
+        response = await client.patch(
+            self.get_endpoint(f"patch/{task_id}"),
+            files={"video": video},
+            data=data,
+            headers=self.headers,
+        )
         res = response.json()
         assert response.status_code == 200
-        assert res.get('text') == "New text" and res.get("task_type").get("name") == "code"
-        assert res.get("video_path") == "media/course_media/course_1/task_1/videos/new_video.mp4"
+        assert (
+            res.get("text") == "New text" and res.get("task_type").get("name") == "code"
+        )
+        assert (
+            res.get("video_path")
+            == "media/course_media/course_1/task_1/videos/new_video.mp4"
+        )

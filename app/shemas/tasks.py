@@ -1,6 +1,5 @@
-import inspect
 import json
-from typing import Annotated, Literal
+from typing import Literal
 from fastapi import Form
 from pydantic import BaseModel, Field, FilePath
 
@@ -21,7 +20,6 @@ class Task(BaseModel):
 
 class CreateTask(Task):
     subsection_id: int = Field(gt=0)
-    answers: list["Answer"] = Field(default=[])
 
     @classmethod
     def as_form(
@@ -30,20 +28,13 @@ class CreateTask(Task):
         scores: int = Form(1),
         subsection_id: int = Form(1),
         task_type: Literal["test", "code", "video"] = Form(),
-        answers: list[str] = Form(
-            default=[],
-            description="This json dump Answer Scheme object\n\
-            read a Answer Scheme model and send jsonify object",
-        ),
     ):
-        answers_m = [Answer(**json.loads(a)) for a in answers]  # type: ignore
         return cls(
             text=text,
             video_path=None,
             scores=scores,
             task_type=TaskType(name=task_type),
             subsection_id=subsection_id,
-            answers=answers_m,
         )
 
 

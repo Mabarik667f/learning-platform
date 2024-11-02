@@ -33,7 +33,6 @@ class TaskCrud(BaseCrud):
         task_tests: list[UploadFile] | None = None,
     ) -> TaskModel:
         task_dict = task_for_create.dict()
-        answers = [Answer(**ans) for ans in task_dict.pop("answers")]
 
         task_type_id = await self.utils.get_task_type_id(
             TaskType(name=task_dict.pop("task_type").get("name"))
@@ -47,7 +46,6 @@ class TaskCrud(BaseCrud):
         upload_media = await self.get_upload_media(task_obj)
         await upload_media.write_video_for_task(task_obj, video)
 
-        await self.utils.create_answers(answers, task_obj)
         if task_tests:
             await self.utils.create_tests_for_question(
                 task_obj, task_tests, upload_media

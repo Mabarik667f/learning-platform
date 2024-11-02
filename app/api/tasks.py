@@ -1,12 +1,17 @@
-from fastapi import APIRouter, Depends, Form, File, UploadFile, status
+from fastapi import APIRouter, Depends, Form, File, HTTPException, UploadFile, status
 
+from crud.tasks import TaskCrud
+from utils.tasks import TaskUtils
+from core.deps import SessionDep
 from media_helpers import check_content_type
 from deps.tasks import TaskCrudDp
 from deps.users import CurActiveUserDep
 
 from shemas.tasks import (
+    Answer,
     CreateTask,
     TaskResponse,
+    TaskType,
     UpdateTask,
     generate_task_response,
 )
@@ -62,3 +67,19 @@ async def patch_task(
     obj = await task_crud.patch_task(task_id, new_task_data, video)
     task_type = await task_crud.get_task_utils().get_task_type_object(obj.task_type_id)
     return generate_task_response(obj, task_type)
+
+@router.post(
+    "/add-answers/{task_id}", response_model=TaskResponse, status_code=status.HTTP_201_CREATED
+)
+async def add_answers_for_task(
+    session: SessionDep,
+    current_user: CurActiveUserDep,
+    task_id: int,
+    answers: list[Answer]
+):
+    task_obj = await TaskCrud(session).get_task(task_id)
+    task_type = task_obj.task_type.name
+    if task_type != "test":
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail={"task_type": "task type is not 'test' !"})
+    await TaskUtils(session).create_answers(answers, task_obj)
+    return generate_task_response(task_obj, task_type)

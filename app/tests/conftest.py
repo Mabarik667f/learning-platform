@@ -28,6 +28,7 @@ async_session_maker = async_sessionmaker(
     async_engine, class_=AsyncSession, expire_on_commit=False
 )
 
+
 async def connection() -> AsyncGenerator[AsyncSession, None]:
     async with async_session_maker() as session:
         try:
@@ -72,6 +73,7 @@ def event_loop(request):
 
     clear_test_media()
 
+
 @pytest.fixture
 async def client():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore
@@ -96,8 +98,10 @@ async def execute_sql_script(filename: str, connection: AsyncConnection):
     with open(path, "r") as f:
         await connection.execute(text(f.read()))
 
+
 def clear_test_media():
     shutil.rmtree("test_dir/")
+
 
 @pytest.fixture(autouse=True)
 def monkeypatch_media_path(monkeypatch: pytest.MonkeyPatch):

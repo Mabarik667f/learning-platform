@@ -4,7 +4,11 @@ from httpx import AsyncClient
 
 from loguru import logger
 
-from tests.helpers.dummy_files import create_dummy_txt, create_dummy_img, create_dummy_video
+from tests.helpers.dummy_files import (
+    create_dummy_txt,
+    create_dummy_img,
+    create_dummy_video,
+)
 
 
 @pytest.fixture
@@ -54,10 +58,6 @@ async def create_task(client: AsyncClient, create_subsection, token: dict):
         "task_type": "test",
         "text": "This text for test-task 2",
         "subsection_id": 1,
-        "answers": [
-            json.dumps({"text": "first", "is_correct": False}),
-            json.dumps({"text": "second", "is_correct": True}),
-        ],
     }
 
     video = create_dummy_video()
@@ -67,6 +67,14 @@ async def create_task(client: AsyncClient, create_subsection, token: dict):
     ]
     files = [("video", ("video.mp4", video))] + task_tests
 
-    await client.post(
-        "/tasks/create", files=files, data=data, headers=token
-    )
+    await client.post("/tasks/create", files=files, data=data, headers=token)
+
+
+@pytest.fixture
+async def create_answers_for_task(client: AsyncClient, create_task, token: dict):
+    answers = [
+        {"text": "first", "is_correct": False},
+        {"text": "second", "is_correct": True},
+    ]
+
+    await client.post("/tasks/add-answers/1", json=answers, headers=token)

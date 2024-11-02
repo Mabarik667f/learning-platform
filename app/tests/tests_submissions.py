@@ -4,6 +4,7 @@ from httpx import AsyncClient
 
 from loguru import logger
 
+
 @pytest.mark.usefixtures("create_task")
 class TestsForSubmission(BaseTestClass):
 
@@ -19,7 +20,9 @@ class TestsForSubmission(BaseTestClass):
             "submission_code": "dasda",
         }
 
-        response = await client.post(self.get_endpoint(f'new-submission'), json=data, headers=self.headers)
+        response = await client.post(
+            self.get_endpoint(f"new-submission"), json=data, headers=self.headers
+        )
         resp_js = response.json()
         assert response.status_code == 200
         assert resp_js.get("submission_answer") == "test answer"
