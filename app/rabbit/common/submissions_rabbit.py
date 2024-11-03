@@ -22,7 +22,7 @@ class NewSubmissionsRabbitMixin:
         queue_name: str = "",
         prefetch_count: int = 1,
     ):
-        await self.channel.set_qos(prefetch_count=prefetch_count)
+        await self.channel.set_qos(prefetch_count=prefetch_count, timeout=20)
         queue = await self.declare_queue_for_new_tasks(queue_name=queue_name)
         await queue.consume(message_callback)
         await asyncio.Future()

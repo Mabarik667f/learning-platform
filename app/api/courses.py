@@ -45,7 +45,7 @@ async def patch(
     current_user: CurActiveUserDep,
     course_id: int,
     course: UpdateCourse = Depends(UpdateCourse.as_form),
-    img: UploadFile = File(None)
+    img: UploadFile = File(None),
 ) -> CourseResponse:
     check_content_type(["image/jpeg", "image/jpg", "image/png"], img)
     course_obj = await course_crud.patch_course(course, course_id, img)

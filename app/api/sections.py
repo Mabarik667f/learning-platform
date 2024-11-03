@@ -12,7 +12,7 @@ from shemas.sections import (
     SubSectionWithTasksResponse,
     UpdateSection,
     UpdateSubSection,
-    get_pydantic_subsections
+    get_pydantic_subsections,
 )
 from loguru import logger
 

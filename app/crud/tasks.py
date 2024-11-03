@@ -70,7 +70,9 @@ class TaskCrud(BaseCrud):
         await self.session.delete(obj)
         await self.session.commit()
 
-    async def patch_task(self, task_id: int, task_for_update: UpdateTask, file: UploadFile) -> TaskModel:
+    async def patch_task(
+        self, task_id: int, task_for_update: UpdateTask, file: UploadFile
+    ) -> TaskModel:
         obj = await self.get_task(task_id)
         task_dict = task_for_update.dict()
 

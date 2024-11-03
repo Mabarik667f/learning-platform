@@ -15,7 +15,12 @@ from models.courses import (
     Section as SectionModel,
     Subsection as SubSectionModel,
 )
-from shemas.sections import CreateSection, CreateSubSection, UpdateSection, UpdateSubSection
+from shemas.sections import (
+    CreateSection,
+    CreateSubSection,
+    UpdateSection,
+    UpdateSubSection,
+)
 
 from loguru import logger
 

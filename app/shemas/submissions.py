@@ -2,6 +2,7 @@ from datetime import datetime
 from pydantic import BaseModel
 from pydantic.fields import Field
 
+
 class Submission(BaseModel):
     task_id: int = Field(gt=0)
     user_id: int = Field(gt=0)

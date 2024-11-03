@@ -18,6 +18,7 @@ class Task(BaseModel):
     scores: int = Field(default=1, gt=0)
     task_type: "TaskType"
 
+
 class CreateTask(Task):
     subsection_id: int = Field(gt=0)
 
@@ -51,7 +52,8 @@ class UpdateTask(Task):
         return cls(
             text=text,
             scores=scores,
-            task_type=TaskType(name=json.loads(task_type)["name"]))
+            task_type=TaskType(name=json.loads(task_type)["name"]),
+        )
 
 
 class AddTaskContent:

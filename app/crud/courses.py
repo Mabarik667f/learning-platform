@@ -19,10 +19,12 @@ from loguru import logger
 
 
 class CourseCrud(BaseCrud):
-    async def create_course(self, course_data: CreateCourse, img: UploadFile) -> CourseModel:
+    async def create_course(
+        self, course_data: CreateCourse, img: UploadFile
+    ) -> CourseModel:
         cr_dict = course_data.dict()
         category_ids = cr_dict.pop("categories")
-        cr_dict['img'] = "/"
+        cr_dict["img"] = "/"
         course = CourseModel(**cr_dict)
 
         categories = await get_list_categories(self.session, category_ids=category_ids)
@@ -64,7 +66,7 @@ class CourseCrud(BaseCrud):
                 setattr(course_obj, key, val)
 
         if img:
-           await self.get_course_utils().upload_course_img(course_obj, img)
+            await self.get_course_utils().upload_course_img(course_obj, img)
 
         await self.session.commit()
         await self.session.refresh(course_obj)

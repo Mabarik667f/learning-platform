@@ -11,6 +11,7 @@ from media_helpers import UploadMediaFile
 
 from loguru import logger
 
+
 class CourseUtils:
 
     def __init__(self, session: AsyncSession) -> None:
@@ -42,9 +43,7 @@ class CourseUtils:
 
         return course
 
-    async def del_category(
-        self, course_id: int, category_id: int
-    ) -> Course:
+    async def del_category(self, course_id: int, category_id: int) -> Course:
         course = await self.get_course_selectionload(course_id)
         if len(course.categories) > 1:
             q = delete(CourseHasCategory).where(

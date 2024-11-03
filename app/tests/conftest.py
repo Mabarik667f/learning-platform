@@ -76,8 +76,9 @@ def event_loop(request):
 
 @pytest.fixture
 async def client():
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore
-        yield client
+    async with app.router.lifespan_context(app):
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:  # type: ignore
+            yield client
 
 
 @pytest.fixture

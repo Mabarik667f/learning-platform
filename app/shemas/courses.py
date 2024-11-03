@@ -15,7 +15,7 @@ from models.courses import Difficulty
 class CourseBase(BaseModel):
     title: str
     describe: str | None = None
-    img: str | None = None #FilePath | None
+    img: str | None = None  # FilePath | None
     price: PositiveInt
     difficulty: Difficulty = Field(default=Difficulty.EASY)
 
@@ -30,14 +30,14 @@ class CreateCourse(CourseBase):
         describe: str | None = Form(None),
         price: PositiveInt = Form(...),
         difficulty: str = Form(Difficulty.EASY),
-        categories: list[int] = Form(...)
+        categories: list[int] = Form(...),
     ):
         return cls(
             title=title,
             describe=describe,
             price=price,
             difficulty=Difficulty(difficulty),
-            categories=categories
+            categories=categories,
         )
 
 
@@ -58,6 +58,7 @@ class UpdateCourse(CourseBase):
             price=price,
             difficulty=Difficulty(difficulty),
         )
+
 
 class AddCategoriesToCourse(BaseModel):
     category_ids: list[int] = [1]

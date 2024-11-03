@@ -6,7 +6,7 @@ from rabbit.base import RabbitBase
 from loguru import logger
 
 
-async def get_submission_result(user_id: int, submission_id: int):
+async def get_submission_result(user_id: int, submission_id: int) -> bool:
 
     async with RabbitBase() as rb:
         res_queue = await rb.channel.declare_queue(f"user_{user_id}_queue")
@@ -25,10 +25,11 @@ async def check_messages(q_it: AbstractQueueIterator, user_id: int, submission_i
             ):
                 logger.info(msg.body.decode())
                 await msg.ack()
-                return msg.body.decode()
+                return True if msg.body.decode() == "True" else False
         except asyncio.TimeoutError:
             logger.info("Timeout reached")
             break
         except Exception as e:
             logger.info(e)
             break
+    return False

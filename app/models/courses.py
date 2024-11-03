@@ -61,7 +61,10 @@ class Section(Base):
 
     course: Mapped["Course"] = relationship(back_populates="sections")
     subsections: Mapped[List["Subsection"]] = relationship(
-        back_populates="section", lazy="selectin", cascade="all, delete", passive_deletes=True
+        back_populates="section",
+        lazy="selectin",
+        cascade="all, delete",
+        passive_deletes=True,
     )
 
 
@@ -78,8 +81,9 @@ class Subsection(Base):
     )
 
     section: Mapped["Section"] = relationship(back_populates="subsections")
-    tasks: Mapped[List["Task"]] = relationship(back_populates="subsection",
-        cascade="all, delete", passive_deletes=True)
+    tasks: Mapped[List["Task"]] = relationship(
+        back_populates="subsection", cascade="all, delete", passive_deletes=True
+    )
 
 
 class Task(Base):
@@ -99,18 +103,27 @@ class Task(Base):
     )
 
     subsection: Mapped["Subsection"] = relationship(back_populates="tasks")
-    task_type: Mapped["TaskType"] = relationship(back_populates="tasks", lazy="selectin")
+    task_type: Mapped["TaskType"] = relationship(
+        back_populates="tasks", lazy="selectin"
+    )
 
     answers: Mapped[list["Answer"]] = relationship(
-        back_populates="task", lazy="selectin", cascade="all, delete", passive_deletes=True
+        back_populates="task",
+        lazy="selectin",
+        cascade="all, delete",
+        passive_deletes=True,
     )
     task_tests: Mapped[list["TaskTest"]] = relationship(
-        back_populates="task", lazy="selectin", passive_deletes=True, cascade="all, delete"
+        back_populates="task",
+        lazy="selectin",
+        passive_deletes=True,
+        cascade="all, delete",
     )
     submissions: Mapped[list["Submission"]] = relationship(back_populates="task")
 
     def get_upload_path_for_video(self, course_id: int):
         return f"{settings.MEDIA_PATH}/course_media/course_{course_id}/task_{self.id}/videos/"
+
 
 class Answer(Base):
     __tablename__ = "answer"
@@ -143,7 +156,9 @@ class TaskType(Base):
     id: Mapped[pk]
     name: Mapped[str] = mapped_column(unique=True)
 
-    tasks: Mapped[list["Task"]] = relationship(back_populates="task_type", lazy="joined")
+    tasks: Mapped[list["Task"]] = relationship(
+        back_populates="task_type", lazy="joined"
+    )
 
 
 class Submission(Base):
@@ -161,4 +176,4 @@ class Submission(Base):
     submission_answer: Mapped[str] = mapped_column(Text)
 
     user: Mapped["User"] = relationship(back_populates="submissions")
-    task: Mapped["Task"] = relationship(back_populates="submissions")
+    task: Mapped["Task"] = relationship(back_populates="submissions", lazy="selectin")

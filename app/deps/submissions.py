@@ -7,4 +7,5 @@ from crud.submissions import SubmissionCrud
 def get_submissions_crud(session: SessionDep) -> SubmissionCrud:
     return SubmissionCrud(session)
 
+
 SubmissionCrudDp = Annotated[SubmissionCrud, Depends(get_submissions_crud)]

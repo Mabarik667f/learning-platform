@@ -95,9 +95,9 @@ class TestsForTasks(BaseTestClass):
         self.headers.update(token)
 
         answers = [
-                {"text": "first", "is_correct": False},
-                {"text": "second", "is_correct": True},
-            ]
+            {"text": "first", "is_correct": False},
+            {"text": "second", "is_correct": True},
+        ]
 
         task_id = 1
         response = await client.post(
@@ -106,7 +106,7 @@ class TestsForTasks(BaseTestClass):
             headers=self.headers,
         )
         assert response.status_code == 201
-        assert len(response.json().get('answers')) == 2
+        assert len(response.json().get("answers")) == 2
 
     @pytest.mark.usefixtures("create_task", "create_answers_for_task")
     async def test_get_task(self, client: AsyncClient, token: dict):

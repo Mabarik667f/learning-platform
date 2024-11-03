@@ -78,3 +78,12 @@ async def create_answers_for_task(client: AsyncClient, create_task, token: dict)
     ]
 
     await client.post("/tasks/add-answers/1", json=answers, headers=token)
+
+
+@pytest.fixture
+async def failed_submission(client: AsyncClient, create_answers_for_task, token: dict):
+    pass
+
+@pytest.fixture
+async def corrected_submission(client: AsyncClient, create_answers_for_task, token: dict):
+    pass

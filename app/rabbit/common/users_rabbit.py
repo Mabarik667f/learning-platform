@@ -6,8 +6,12 @@ from aio_pika.abc import (
     AbstractExchange,
 )
 from aio_pika import Message
+from sqlalchemy.ext.asyncio import AsyncSession
+from services.task_checkers import SubmissionChecker
+from crud.submissions import SubmissionCrud
 from rabbit.base import RabbitBase
-
+from core.deps import get_async_session_maker, get_db
+from loguru import logger
 
 class SendResultToUserRabbitMixin:
 
@@ -32,13 +36,22 @@ class SendResultToUserRabbitMixin:
     ):
         exchange = await self.declare_users_exchange()
         res_queue = await self.declare_user_res_queue(msg, exchange)
+        res_of_sub = await self.check_sub_res(msg)
         await exchange.publish(
-            Message(body=f"Result".encode(),
-                headers={"user_id": msg.headers.get("user_id"),
-                    "submission_id": int(msg.body)}
+            Message(
+                body=f"{res_of_sub}".encode(),
+                headers={
+                    "user_id": msg.headers.get("user_id"),
+                    "submission_id": int(msg.body),
+                },
             ),
             routing_key=res_queue.name,
         )
+
+    async def check_sub_res(self, msg: AbstractIncomingMessage):
+        async for session in get_db():
+            sub = await SubmissionCrud(session).get_submission(int(msg.body))
+            return await SubmissionChecker(session, sub).check()
 
 
 class SendResultToUserRabbit(SendResultToUserRabbitMixin, RabbitBase):  # type: ignore

@@ -11,11 +11,12 @@ from models.courses import (
     TaskTest as TaskTestModel,
     Course as CourseModel,
     Section as SectionModel,
-    Subsection as SubsectionModel
+    Subsection as SubsectionModel,
 )
 
 from sqlalchemy.ext.asyncio import AsyncSession
 from shutil import rmtree
+
 
 class UploadMediaFile:
 

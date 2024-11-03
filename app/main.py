@@ -1,12 +1,17 @@
+import asyncio
+from contextlib import asynccontextmanager
 import sys
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Response, status
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from fastapi import Request
 from starlette.routing import Match
 
+from deps.users import CurActiveUserDep
+from rabbit.get_result import get_submission_result
+from rabbit.consumer_submissions import run_submissions_consumer
 from core.exceptions import CoreValidationError
 from api import api_router
 from core.config import settings
@@ -33,7 +38,16 @@ logger.add(
 )
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    task = asyncio.create_task(run_submissions_consumer())
+    try:
+        yield
+    finally:
+        task.cancel()
+
+
+app = FastAPI(lifespan=lifespan)
 
 app.include_router(api_router)
 # app.mount("/media", StaticFiles(directory="media"), name="media")

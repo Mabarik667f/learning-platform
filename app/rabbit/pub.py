@@ -1,5 +1,3 @@
-import asyncio
-
 import aio_pika
 
 from core.config import settings
@@ -17,10 +15,3 @@ async def pub_m(submission_id: int, user_id: int) -> None:
             ),
             routing_key=routing_key,
         )
-
-
-if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        logger.info("CLOSE")

@@ -15,6 +15,7 @@ from models.courses import (
 from shemas.tasks import Answer, TaskType, TaskTest
 from loguru import logger
 
+
 class TaskUtils(BaseCrud):
 
     async def get_task_type_id(self, task_type: TaskType) -> int:
@@ -37,9 +38,7 @@ class TaskUtils(BaseCrud):
     async def create_answers(self, answers: list[Answer], task: TaskModel) -> None:
         for ans in answers:
             ans_obj = AnswerModel(
-                text=ans.text.lower(),
-                is_correct=ans.is_correct,
-                task_id=task.id
+                text=ans.text.lower(), is_correct=ans.is_correct, task_id=task.id
             )
             self.session.add(ans_obj)
             task.answers.append(ans_obj)

@@ -1,3 +1,4 @@
+import asyncio
 import pytest
 from tests.helpers.test_class import BaseTestClass
 from httpx import AsyncClient
@@ -26,3 +27,5 @@ class TestsForSubmission(BaseTestClass):
         resp_js = response.json()
         assert response.status_code == 200
         assert resp_js.get("submission_answer") == "test answer"
+
+        await asyncio.sleep(10)
